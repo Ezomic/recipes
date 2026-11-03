@@ -25,6 +25,10 @@ const recipe: RecipeWithIngredients = {
     houdbaar: true,
     created_at: '',
     updated_at: '',
+    tags: [
+        { id: 1, name: 'soep' },
+        { id: 2, name: 'winter' },
+    ],
     ingredients: [
         { id: 1, position: 0, quantity: 250.5, unit: 'g', name: 'Bloem' },
         { id: 2, position: 1, quantity: null, unit: null, name: 'Zout' },
@@ -143,5 +147,42 @@ describe('RecipeForm', () => {
             'eetlepel',
             'theelepel',
         ]);
+    });
+
+    it('starts a new recipe without tags and prefills an existing one', () => {
+        expect(
+            mount(RecipeForm).findAll('[data-testid="tag-chip"]'),
+        ).toHaveLength(0);
+
+        const wrapper = mount(RecipeForm, { props: { recipe } });
+        expect(
+            wrapper
+                .findAll('[data-testid="tag-chip"]')
+                .map((chip) => chip.text()),
+        ).toEqual(['soep', 'winter']);
+    });
+
+    it('passes the known tags on as suggestions', () => {
+        const wrapper = mount(RecipeForm, {
+            props: { knownTags: ['brood', 'kamperen'] },
+        });
+
+        expect(
+            wrapper
+                .findAll('datalist option')
+                .map((o) => o.attributes('value')),
+        ).toEqual(['brood', 'kamperen']);
+    });
+
+    it('shows a validation error on the tags', async () => {
+        const wrapper = mount(RecipeForm, { props: { recipe } });
+        (
+            wrapper.vm as unknown as {
+                form: { setError: (key: string, message: string) => void };
+            }
+        ).form.setError('tags', 'Te veel tags.');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).toContain('Te veel tags.');
     });
 });

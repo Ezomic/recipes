@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2 } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
+import TagInput from '@/components/TagInput.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ import type { RecipeWithIngredients } from '@/types';
 
 const props = defineProps<{
     recipe?: RecipeWithIngredients;
+    knownTags?: string[];
 }>();
 
 function blankIngredient(): { quantity: string; unit: string; name: string } {
@@ -26,6 +28,7 @@ const form = useForm({
     preparation_minutes: String(props.recipe?.preparation_minutes ?? ''),
     servings: String(props.recipe?.servings ?? ''),
     houdbaar: props.recipe?.houdbaar ?? false,
+    tags: props.recipe?.tags.map((tag) => tag.name) ?? [],
     ingredients: props.recipe?.ingredients.length
         ? props.recipe.ingredients.map((ingredient) => ({
               quantity:
@@ -49,6 +52,12 @@ const ingredientErrors = computed<string[]>(() =>
 const stepErrors = computed<string[]>(() =>
     Object.entries(form.errors)
         .filter(([key]) => key === 'steps' || key.startsWith('steps.'))
+        .map(([, message]) => message),
+);
+
+const tagErrors = computed<string[]>(() =>
+    Object.entries(form.errors)
+        .filter(([key]) => key === 'tags' || key.startsWith('tags.'))
         .map(([, message]) => message),
 );
 
@@ -118,6 +127,16 @@ function submit(): void {
             <Label for="houdbaar">Houdbaar (bewaren zonder koelkast)</Label>
         </div>
         <InputError :message="form.errors.houdbaar" />
+
+        <div class="grid gap-2">
+            <Label for="new-tag">Tags</Label>
+            <TagInput v-model="form.tags" :suggestions="knownTags" />
+            <InputError
+                v-for="message in tagErrors"
+                :key="message"
+                :message="message"
+            />
+        </div>
 
         <fieldset class="grid gap-3">
             <legend class="mb-1 text-sm leading-none font-medium">

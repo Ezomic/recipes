@@ -3,6 +3,10 @@ import { Head } from '@inertiajs/vue3';
 import RecipeForm from '@/components/RecipeForm.vue';
 import { create, index } from '@/routes/recipes';
 
+defineProps<{
+    knownTags: string[];
+}>();
+
 defineOptions({
     layout: {
         breadcrumbs: [
@@ -19,6 +23,6 @@ defineOptions({
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
         <h1 class="text-xl font-semibold">Nieuw recept</h1>
 
-        <RecipeForm />
+        <RecipeForm :known-tags="knownTags" />
     </div>
 </template>

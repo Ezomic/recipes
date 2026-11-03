@@ -25,6 +25,10 @@ const recipe: RecipeWithIngredients = {
     houdbaar: false,
     created_at: '',
     updated_at: '',
+    tags: [
+        { id: 1, name: 'soep' },
+        { id: 2, name: 'winter' },
+    ],
     ingredients: [
         { id: 1, position: 0, quantity: 250, unit: 'g', name: 'Bloem' },
         { id: 2, position: 1, quantity: 1, unit: 'eetlepel', name: 'Olie' },
@@ -108,5 +112,19 @@ describe('recipes/Show', () => {
         });
 
         expect(wrapper.text()).toContain('Geen ingrediënten.');
+    });
+
+    it('shows the tags as chips and nothing when there are none', () => {
+        const wrapper = mount(Show, { props: { recipe } });
+        expect(
+            wrapper
+                .findAll('[data-testid="recipe-tag"]')
+                .map((chip) => chip.text()),
+        ).toEqual(['soep', 'winter']);
+
+        const bare = mount(Show, {
+            props: { recipe: { ...recipe, tags: [] } },
+        });
+        expect(bare.findAll('[data-testid="recipe-tag"]')).toHaveLength(0);
     });
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Concerns;
 
 use App\Enums\IngredientUnit;
+use App\Models\Tag;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -29,18 +30,41 @@ trait RecipeValidationRules
             'ingredients.*.quantity' => ['nullable', 'required_with:ingredients.*.unit', 'numeric', 'decimal:0,2', 'gt:0', 'max:100000'],
             'ingredients.*.unit' => ['nullable', Rule::enum(IngredientUnit::class)],
             'ingredients.*.name' => ['nullable', 'required_with:ingredients.*.quantity,ingredients.*.unit', 'string', 'max:255'],
+            'tags' => ['nullable', 'array', 'max:20'],
+            'tags.*' => ['string', 'max:'.Tag::MAX_LENGTH],
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $ingredients = $this->input('ingredients');
+        $tags = $this->input('tags');
 
-        if (! is_array($ingredients)) {
-            return;
+        $this->merge([
+            ...(is_array($ingredients) ? ['ingredients' => array_map($this->normaliseIngredient(...), $ingredients)] : []),
+            ...(is_array($tags) ? ['tags' => $this->normaliseTags($tags)] : []),
+        ]);
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $tags
+     * @return list<mixed>
+     */
+    private function normaliseTags(array $tags): array
+    {
+        $kept = [];
+
+        foreach ($tags as $tag) {
+            if (is_string($tag)) {
+                $tag = Tag::normalise($tag);
+            }
+
+            if ($tag !== null && $tag !== '') {
+                $kept[] = $tag;
+            }
         }
 
-        $this->merge(['ingredients' => array_map($this->normaliseIngredient(...), $ingredients)]);
+        return array_values(array_unique($kept, SORT_REGULAR));
     }
 
     private function normaliseIngredient(mixed $row): mixed
@@ -97,6 +121,10 @@ trait RecipeValidationRules
             'ingredients.*.name.required_with' => 'Vul bij ingrediënt :position een naam in.',
             'ingredients.*.name.string' => 'De naam van ingrediënt :position moet tekst zijn.',
             'ingredients.*.name.max' => 'De naam van ingrediënt :position mag maximaal 255 tekens lang zijn.',
+            'tags.array' => 'De tags zijn ongeldig.',
+            'tags.max' => 'Een recept mag maximaal 20 tags hebben.',
+            'tags.*.string' => 'Een tag moet tekst zijn.',
+            'tags.*.max' => 'Een tag mag maximaal 50 tekens lang zijn.',
         ];
     }
 }

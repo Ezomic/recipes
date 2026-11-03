@@ -55,6 +55,14 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
+     * @return HasMany<Tag, $this>
+     */
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
+    /**
      * Since 13.32 Laravel refuses a remember-me cookie when this is not a string, and a
      * user provisioned through ID has no password, so the cookie every sign-in through ID
      * sets was never honoured. An empty string never passes a password check, because the
