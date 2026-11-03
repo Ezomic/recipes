@@ -25,6 +25,7 @@ it('refuses a second user, since the app has exactly one login', function () {
     User::factory()->create();
 
     $this->artisan('user:create', ['name' => 'Second', 'email' => 'second@example.com'])
+        ->expectsQuestion('Password', 'a-long-enough-secret')
         ->expectsOutputToContain('already')
         ->assertFailed();
 
@@ -45,4 +46,12 @@ it('refuses a weak password', function () {
         ->assertFailed();
 
     expect(User::query()->count())->toBe(0);
+});
+
+it('stores the email trimmed and lowercased', function () {
+    $this->artisan('user:create', ['name' => 'Robbin', 'email' => 'Robbin@Example.COM'])
+        ->expectsQuestion('Password', 'a-long-enough-secret')
+        ->assertSuccessful();
+
+    expect(User::query()->firstOrFail()->email)->toBe('robbin@example.com');
 });

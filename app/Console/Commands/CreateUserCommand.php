@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Actions\Users\CreateUser;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 
@@ -19,12 +18,6 @@ final class CreateUserCommand extends Command
 
     public function handle(CreateUser $action): int
     {
-        if (User::query()->exists()) {
-            $this->components->error('A user already exists. This app has exactly one login.');
-
-            return self::FAILURE;
-        }
-
         try {
             $user = $action->handle(
                 (string) $this->argument('name'),
