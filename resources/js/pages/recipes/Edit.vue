@@ -2,10 +2,10 @@
 import { Head } from '@inertiajs/vue3';
 import RecipeForm from '@/components/RecipeForm.vue';
 import { index } from '@/routes/recipes';
-import type { Recipe } from '@/types';
+import type { RecipeWithIngredients } from '@/types';
 
 defineProps<{
-    recipe: Recipe;
+    recipe: RecipeWithIngredients;
 }>();
 
 defineOptions({

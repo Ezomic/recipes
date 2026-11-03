@@ -459,6 +459,7 @@ it('trims and filters when called directly, without the HTTP middleware', functi
         preparationMinutes: 5,
         servings: 2,
         houdbaar: false,
+        ingredients: [],
     );
 
     expect($recipe)
@@ -477,6 +478,7 @@ it('updates the given recipe instead of creating a new one', function () {
         preparationMinutes: 5,
         servings: 2,
         houdbaar: true,
+        ingredients: [],
         recipe: $recipe,
     );
 
