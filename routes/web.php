@@ -13,7 +13,9 @@ Route::get('/', fn () => redirect()->route(Auth::check() ? 'recipes.index' : 'lo
 Route::get('health', HealthController::class)->name('health');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('recepten', [RecipeController::class, 'index'])->name('recipes.index');
+    Route::resource('recepten', RecipeController::class)
+        ->parameters(['recepten' => 'recipe'])
+        ->names('recipes');
 
     Route::resource('notes', NoteController::class)->except('show');
 });
