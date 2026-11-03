@@ -31,7 +31,7 @@ const form = useForm({
               quantity:
                   ingredient.quantity === null
                       ? ''
-                      : String(ingredient.quantity),
+                      : String(ingredient.quantity).replace('.', ','),
               unit: ingredient.unit ?? '',
               name: ingredient.name,
           }))

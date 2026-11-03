@@ -29,6 +29,10 @@ final class SaveRecipe
         return DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $recipe): Recipe {
             $recipe ??= $user->recipes()->make();
 
+            if ($recipe->exists) {
+                Recipe::query()->whereKey($recipe->getKey())->lockForUpdate()->first();
+            }
+
             $recipe->forceFill([
                 'title' => Str::trim($title),
                 'steps' => $this->cleanSteps($steps),

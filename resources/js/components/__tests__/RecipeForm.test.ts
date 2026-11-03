@@ -26,7 +26,7 @@ const recipe: RecipeWithIngredients = {
     created_at: '',
     updated_at: '',
     ingredients: [
-        { id: 1, position: 0, quantity: 250, unit: 'g', name: 'Bloem' },
+        { id: 1, position: 0, quantity: 250.5, unit: 'g', name: 'Bloem' },
         { id: 2, position: 1, quantity: null, unit: null, name: 'Zout' },
     ],
 };
@@ -92,7 +92,7 @@ describe('RecipeForm', () => {
             'Zout',
         ]);
         expect(quantities.map((input) => input.element.value)).toEqual([
-            '250',
+            '250,5',
             '',
         ]);
         expect(units.map((select) => select.element.value)).toEqual(['g', '']);
