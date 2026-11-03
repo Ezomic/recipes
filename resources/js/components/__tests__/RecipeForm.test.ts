@@ -1,6 +1,7 @@
+import { router } from '@inertiajs/vue3';
 import type * as InertiaVue from '@inertiajs/vue3';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import RecipeForm from '@/components/RecipeForm.vue';
 import type { RecipeWithIngredients } from '@/types';
 
@@ -14,6 +15,7 @@ vi.mock('@/routes/recipes', () => ({
     show: (id: number) => `/recepten/${id}`,
     store: () => ({ url: '/recepten' }),
     update: (id: number) => ({ url: `/recepten/${id}` }),
+    photo: (id: number) => ({ url: `/recepten/${id}/foto` }),
 }));
 
 const recipe: RecipeWithIngredients = {
@@ -23,6 +25,7 @@ const recipe: RecipeWithIngredients = {
     preparation_minutes: 45,
     servings: 6,
     houdbaar: true,
+    photo_version: null,
     created_at: '',
     updated_at: '',
     tags: [
@@ -184,5 +187,118 @@ describe('RecipeForm', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.text()).toContain('Te veel tags.');
+    });
+
+    describe('photo', () => {
+        const withPhoto = { ...recipe, photo_version: 'abc' };
+        const file = new File(['x'], 'foto.png', { type: 'image/png' });
+
+        afterEach(() => {
+            vi.restoreAllMocks();
+        });
+
+        async function choose(wrapper: ReturnType<typeof mount>) {
+            const input = wrapper.find<HTMLInputElement>('#photo');
+            Object.defineProperty(input.element, 'files', {
+                value: [file],
+                configurable: true,
+            });
+            await input.trigger('change');
+        }
+
+        it('offers a file input limited to jpeg, png and webp', () => {
+            const input = mount(RecipeForm).find('#photo');
+
+            expect(input.attributes('type')).toBe('file');
+            expect(input.attributes('accept')).toBe(
+                'image/jpeg,image/png,image/webp',
+            );
+        });
+
+        it('offers no remove option when there is no photo', () => {
+            expect(mount(RecipeForm).find('#remove_photo').exists()).toBe(
+                false,
+            );
+            expect(
+                mount(RecipeForm, { props: { recipe } })
+                    .find('#remove_photo')
+                    .exists(),
+            ).toBe(false);
+        });
+
+        it('shows the current photo with a remove option on edit', () => {
+            const wrapper = mount(RecipeForm, { props: { recipe: withPhoto } });
+
+            expect(wrapper.find('img').attributes('alt')).toBe('Foto van Soep');
+            expect(wrapper.text()).toContain('Foto verwijderen');
+        });
+
+        it('forgets the remove choice and disables it once a new file is chosen', async () => {
+            const wrapper = mount(RecipeForm, { props: { recipe: withPhoto } });
+            const remove = wrapper.find('#remove_photo');
+            await remove.trigger('click');
+            expect(remove.attributes('aria-checked')).toBe('true');
+
+            await choose(wrapper);
+
+            expect(remove.attributes('aria-checked')).toBe('false');
+            expect(remove.attributes('disabled')).toBeDefined();
+        });
+
+        it('clears the chosen file when the file dialog is cancelled', async () => {
+            const wrapper = mount(RecipeForm);
+            await choose(wrapper);
+            const input = wrapper.find<HTMLInputElement>('#photo');
+            Object.defineProperty(input.element, 'files', {
+                value: [],
+                configurable: true,
+            });
+            await input.trigger('change');
+            const visit = vi
+                .spyOn(router, 'visit')
+                .mockImplementation(() => {});
+            await wrapper.find('form').trigger('submit');
+
+            expect(visit.mock.calls[0][1]?.data).toMatchObject({ photo: null });
+        });
+
+        it('posts a new recipe with the chosen file', async () => {
+            const wrapper = mount(RecipeForm);
+            const visit = vi
+                .spyOn(router, 'visit')
+                .mockImplementation(() => {});
+            await choose(wrapper);
+            await wrapper.find('form').trigger('submit');
+
+            expect(visit.mock.calls[0][1]?.method).toBe('post');
+            expect(visit.mock.calls[0][1]?.data).toMatchObject({ photo: file });
+        });
+
+        it('spoofs PUT through POST on edit so PHP can read the multipart body', async () => {
+            const wrapper = mount(RecipeForm, { props: { recipe: withPhoto } });
+            const visit = vi
+                .spyOn(router, 'visit')
+                .mockImplementation(() => {});
+            await wrapper.find('form').trigger('submit');
+
+            expect(visit.mock.calls[0][0]).toBe('/recepten/7');
+            expect(visit.mock.calls[0][1]?.method).toBe('post');
+            expect(visit.mock.calls[0][1]?.data).toMatchObject({
+                _method: 'put',
+                remove_photo: false,
+            });
+        });
+
+        it('shows a validation error on the photo', async () => {
+            const wrapper = mount(RecipeForm);
+            (
+                wrapper.vm as unknown as {
+                    form: { setError: (key: string, message: string) => void };
+                }
+            ).form.setError('photo', 'Te groot.');
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.text()).toContain('Te groot.');
+        });
     });
 });

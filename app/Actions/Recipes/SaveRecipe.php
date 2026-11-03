@@ -8,12 +8,18 @@ use App\Enums\IngredientUnit;
 use App\Models\Recipe;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class SaveRecipe
 {
-    public function __construct(private readonly PruneUnusedTags $pruneUnusedTags = new PruneUnusedTags) {}
+    public function __construct(
+        private readonly PruneUnusedTags $pruneUnusedTags = new PruneUnusedTags,
+        private readonly StoreRecipePhoto $storePhoto = new StoreRecipePhoto,
+        private readonly DeleteRecipePhoto $deletePhoto = new DeleteRecipePhoto,
+    ) {}
 
     /**
      * @param  array<array-key, mixed>  $steps
@@ -30,32 +36,50 @@ final class SaveRecipe
         array $ingredients,
         array $tags = [],
         ?Recipe $recipe = null,
+        ?UploadedFile $photo = null,
+        bool $removePhoto = false,
     ): Recipe {
-        return DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $tags, $recipe): Recipe {
-            $recipe ??= $user->recipes()->make();
+        $newPhoto = $photo instanceof UploadedFile ? $this->storePhoto->handle($user, $photo) : null;
+        $oldPhoto = null;
 
-            if ($recipe->exists) {
-                Recipe::query()->whereKey($recipe->getKey())->lockForUpdate()->first();
-            }
+        try {
+            $saved = DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $tags, $recipe, $newPhoto, $removePhoto, &$oldPhoto): Recipe {
+                $recipe ??= $user->recipes()->make();
 
-            $recipe->forceFill([
-                'title' => Str::trim($title),
-                'steps' => $this->cleanSteps($steps),
-                'preparation_minutes' => $preparationMinutes,
-                'servings' => $servings,
-                'houdbaar' => $houdbaar,
-            ])->save();
+                if ($recipe->exists) {
+                    $oldPhoto = Recipe::query()->whereKey($recipe->getKey())->lockForUpdate()->first()?->photo_path;
+                }
 
-            $recipe->ingredients()->delete();
-            $recipe->ingredients()->createMany($this->cleanIngredients($ingredients));
-            $recipe->unsetRelation('ingredients');
+                $recipe->forceFill([
+                    'title' => Str::trim($title),
+                    'steps' => $this->cleanSteps($steps),
+                    'preparation_minutes' => $preparationMinutes,
+                    'servings' => $servings,
+                    'houdbaar' => $houdbaar,
+                    ...($newPhoto !== null || $removePhoto ? ['photo_path' => $newPhoto] : []),
+                ])->save();
 
-            $recipe->tags()->sync($this->resolveTags($user, $tags));
-            $recipe->unsetRelation('tags');
-            $this->pruneUnusedTags->handle($user);
+                $recipe->ingredients()->delete();
+                $recipe->ingredients()->createMany($this->cleanIngredients($ingredients));
+                $recipe->unsetRelation('ingredients');
 
-            return $recipe;
-        });
+                $recipe->tags()->sync($this->resolveTags($user, $tags));
+                $recipe->unsetRelation('tags');
+                $this->pruneUnusedTags->handle($user);
+
+                return $recipe;
+            });
+        } catch (Throwable $exception) {
+            $this->deletePhoto->handle($newPhoto);
+
+            throw $exception;
+        }
+
+        if ($oldPhoto !== $saved->photo_path) {
+            $this->deletePhoto->handle($oldPhoto);
+        }
+
+        return $saved;
     }
 
     /**

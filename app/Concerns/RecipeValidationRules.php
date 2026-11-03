@@ -7,6 +7,7 @@ namespace App\Concerns;
 use App\Enums\IngredientUnit;
 use App\Models\Tag;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -32,7 +33,16 @@ trait RecipeValidationRules
             'ingredients.*.name' => ['nullable', 'required_with:ingredients.*.quantity,ingredients.*.unit', 'string', 'max:255'],
             'tags' => ['nullable', 'array', 'max:20'],
             'tags.*' => ['string', 'max:'.Tag::MAX_LENGTH],
+            'photo' => ['nullable', 'bail', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png,image/webp', 'dimensions:max_width=6000,max_height=6000'],
+            'remove_photo' => ['nullable', 'boolean'],
         ];
+    }
+
+    public function photo(): ?UploadedFile
+    {
+        $photo = $this->file('photo');
+
+        return $photo instanceof UploadedFile ? $photo : null;
     }
 
     protected function prepareForValidation(): void
@@ -125,6 +135,12 @@ trait RecipeValidationRules
             'tags.max' => 'Een recept mag maximaal 20 tags hebben.',
             'tags.*.string' => 'Een tag moet tekst zijn.',
             'tags.*.max' => 'Een tag mag maximaal 50 tekens lang zijn.',
+            'photo.file' => 'Kies een afbeelding om te uploaden.',
+            'photo.uploaded' => 'Het uploaden van de foto is mislukt.',
+            'photo.max' => 'De foto mag maximaal 5 MB groot zijn.',
+            'photo.mimetypes' => 'De foto moet een jpeg-, png- of webp-afbeelding zijn.',
+            'photo.dimensions' => 'De foto mag maximaal 6000 bij 6000 pixels groot zijn.',
+            'remove_photo.boolean' => 'Foto verwijderen moet ja of nee zijn.',
         ];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Recipes\DeleteRecipePhoto;
 use App\Actions\Recipes\PruneUnusedTags;
 use App\Actions\Recipes\SaveRecipe;
 use App\Actions\Recipes\SearchRecipes;
@@ -53,6 +54,8 @@ final class RecipeController extends Controller
             houdbaar: $request->boolean('houdbaar'),
             ingredients: $request->array('ingredients'),
             tags: $request->array('tags'),
+            photo: $request->photo(),
+            removePhoto: $request->boolean('remove_photo'),
         );
 
         return to_route('recipes.show', $recipe);
@@ -87,16 +90,19 @@ final class RecipeController extends Controller
             ingredients: $request->array('ingredients'),
             tags: $request->array('tags'),
             recipe: $recipe,
+            photo: $request->photo(),
+            removePhoto: $request->boolean('remove_photo'),
         );
 
         return to_route('recipes.show', $recipe);
     }
 
-    public function destroy(Request $request, Recipe $recipe, PruneUnusedTags $pruneUnusedTags): RedirectResponse
+    public function destroy(Request $request, Recipe $recipe, PruneUnusedTags $pruneUnusedTags, DeleteRecipePhoto $deletePhoto): RedirectResponse
     {
         $this->authorize('delete', $recipe);
 
         $recipe->delete();
+        $deletePhoto->handle($recipe->photo_path);
         $pruneUnusedTags->handle($this->user($request));
 
         return to_route('recipes.index');
