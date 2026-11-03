@@ -244,8 +244,8 @@ it('rejects invalid photos with a Dutch message and stores nothing', function (c
     'html as png' => [fn () => uploadOf('<html><script>alert(1)</script></html>', 'a.png'), 'De foto moet een jpeg-, png- of webp-afbeelding zijn.'],
     'gif' => [fn () => uploadOf(base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', true) ?: '', 'a.gif'), 'De foto moet een jpeg-, png- of webp-afbeelding zijn.'],
     'over 5 MB' => [fn () => UploadedFile::fake()->image('big.jpg', 20, 20)->size(5121), 'De foto mag maximaal 5 MB groot zijn.'],
-    'declared dimensions too large' => [fn () => uploadOf(pngWithDeclaredSize(60000, 60000), 'bomb.png'), 'De foto mag maximaal 6000 bij 6000 pixels groot zijn.'],
-    'wider than allowed' => [fn () => uploadOf(pngWithDeclaredSize(6001, 1), 'wide.png'), 'De foto mag maximaal 6000 bij 6000 pixels groot zijn.'],
+    'declared dimensions too large' => [fn () => uploadOf(pngWithDeclaredSize(60000, 60000), 'bomb.png'), 'De foto mag maximaal 4000 bij 4000 pixels groot zijn.'],
+    'wider than allowed' => [fn () => uploadOf(pngWithDeclaredSize(4001, 1), 'wide.png'), 'De foto mag maximaal 4000 bij 4000 pixels groot zijn.'],
     'corrupt image data' => [fn () => uploadOf(pngWithDeclaredSize(10, 10, true), 'corrupt.png'), 'Deze foto kon niet worden verwerkt. Kies een andere afbeelding.'],
     'failed upload' => [fn () => new UploadedFile(tempnam(sys_get_temp_dir(), 'upl') ?: '', 'a.jpg', null, UPLOAD_ERR_INI_SIZE, true), 'Het uploaden van de foto is mislukt.'],
 ]);

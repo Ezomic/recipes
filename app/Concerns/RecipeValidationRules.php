@@ -33,7 +33,7 @@ trait RecipeValidationRules
             'ingredients.*.name' => ['nullable', 'required_with:ingredients.*.quantity,ingredients.*.unit', 'string', 'max:255'],
             'tags' => ['nullable', 'array', 'max:20'],
             'tags.*' => ['string', 'max:'.Tag::MAX_LENGTH],
-            'photo' => ['nullable', 'bail', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png,image/webp', 'dimensions:max_width=6000,max_height=6000'],
+            'photo' => ['nullable', 'bail', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png,image/webp', 'dimensions:max_width=4000,max_height=4000'],
             'remove_photo' => ['nullable', 'boolean'],
         ];
     }
@@ -139,7 +139,7 @@ trait RecipeValidationRules
             'photo.uploaded' => 'Het uploaden van de foto is mislukt.',
             'photo.max' => 'De foto mag maximaal 5 MB groot zijn.',
             'photo.mimetypes' => 'De foto moet een jpeg-, png- of webp-afbeelding zijn.',
-            'photo.dimensions' => 'De foto mag maximaal 6000 bij 6000 pixels groot zijn.',
+            'photo.dimensions' => 'De foto mag maximaal 4000 bij 4000 pixels groot zijn.',
             'remove_photo.boolean' => 'Foto verwijderen moet ja of nee zijn.',
         ];
     }

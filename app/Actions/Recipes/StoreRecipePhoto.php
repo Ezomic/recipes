@@ -35,9 +35,10 @@ final class StoreRecipePhoto
             throw ValidationException::withMessages(['photo' => 'Deze foto kon niet worden verwerkt. Kies een andere afbeelding.']);
         }
 
+        $source = ExifOrientation::apply($source, ExifOrientation::read($bytes));
         $path = self::directory($user).'/'.Str::lower((string) Str::ulid()).'.jpg';
 
-        if (Storage::disk('local')->put($path, $this->encode(ExifOrientation::apply($source, ExifOrientation::read($bytes)))) === false) {
+        if (Storage::disk('local')->put($path, $this->encode($source)) === false) {
             throw new RuntimeException('The recipe photo could not be written to disk.');
         }
 
