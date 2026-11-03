@@ -4,4 +4,5 @@ export * from './navigation';
 export * from './note';
 export * from './pagination';
 export * from './portal';
+export * from './recipe';
 export * from './ui';
