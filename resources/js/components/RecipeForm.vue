@@ -9,11 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { index, show, store, update } from '@/routes/recipes';
-import type { Recipe } from '@/types';
+import { INGREDIENT_UNITS } from '@/types';
+import type { RecipeWithIngredients } from '@/types';
 
 const props = defineProps<{
-    recipe?: Recipe;
+    recipe?: RecipeWithIngredients;
 }>();
+
+function blankIngredient(): { quantity: string; unit: string; name: string } {
+    return { quantity: '', unit: '', name: '' };
+}
 
 const form = useForm({
     title: props.recipe?.title ?? '',
@@ -21,7 +26,25 @@ const form = useForm({
     preparation_minutes: String(props.recipe?.preparation_minutes ?? ''),
     servings: String(props.recipe?.servings ?? ''),
     houdbaar: props.recipe?.houdbaar ?? false,
+    ingredients: props.recipe?.ingredients.length
+        ? props.recipe.ingredients.map((ingredient) => ({
+              quantity:
+                  ingredient.quantity === null
+                      ? ''
+                      : String(ingredient.quantity).replace('.', ','),
+              unit: ingredient.unit ?? '',
+              name: ingredient.name,
+          }))
+        : [blankIngredient()],
 });
+
+const ingredientErrors = computed<string[]>(() =>
+    Object.entries(form.errors)
+        .filter(
+            ([key]) => key === 'ingredients' || key.startsWith('ingredients.'),
+        )
+        .map(([, message]) => message),
+);
 
 const stepErrors = computed<string[]>(() =>
     Object.entries(form.errors)
@@ -39,6 +62,14 @@ function addStep(): void {
 
 function removeStep(position: number): void {
     form.steps.splice(position, 1);
+}
+
+function addIngredient(): void {
+    form.ingredients.push(blankIngredient());
+}
+
+function removeIngredient(position: number): void {
+    form.ingredients.splice(position, 1);
 }
 
 function submit(): void {
@@ -87,6 +118,73 @@ function submit(): void {
             <Label for="houdbaar">Houdbaar (bewaren zonder koelkast)</Label>
         </div>
         <InputError :message="form.errors.houdbaar" />
+
+        <fieldset class="grid gap-3">
+            <legend class="mb-1 text-sm leading-none font-medium">
+                Ingrediënten
+            </legend>
+
+            <div
+                v-for="(ingredient, position) in form.ingredients"
+                :key="position"
+                class="flex items-start gap-2"
+            >
+                <Input
+                    v-model="ingredient.quantity"
+                    :aria-label="`Hoeveelheid ingrediënt ${position + 1}`"
+                    inputmode="decimal"
+                    placeholder="Hoeveelheid"
+                    class="w-28 shrink-0"
+                />
+                <select
+                    v-model="ingredient.unit"
+                    :aria-label="`Eenheid ingrediënt ${position + 1}`"
+                    class="h-9 w-32 shrink-0 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                    <option value="">Geen eenheid</option>
+                    <option
+                        v-for="unit in INGREDIENT_UNITS"
+                        :key="unit"
+                        :value="unit"
+                    >
+                        {{ unit }}
+                    </option>
+                </select>
+                <Input
+                    v-model="ingredient.name"
+                    :aria-label="`Naam ingrediënt ${position + 1}`"
+                    placeholder="Naam"
+                    class="min-w-0 flex-1"
+                />
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    :aria-label="`Verwijder ingrediënt ${position + 1}`"
+                    @click="removeIngredient(position)"
+                >
+                    <Trash2 class="size-4" />
+                </Button>
+            </div>
+
+            <InputError
+                v-for="message in ingredientErrors"
+                :key="message"
+                :message="message"
+            />
+
+            <div>
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    @click="addIngredient"
+                >
+                    <Plus class="size-4" />
+                    Ingrediënt toevoegen
+                </Button>
+            </div>
+        </fieldset>
 
         <fieldset class="grid gap-3">
             <legend class="mb-1 text-sm leading-none font-medium">

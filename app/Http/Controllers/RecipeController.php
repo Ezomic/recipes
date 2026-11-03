@@ -42,6 +42,7 @@ final class RecipeController extends Controller
             preparationMinutes: $request->integer('preparation_minutes'),
             servings: $request->integer('servings'),
             houdbaar: $request->boolean('houdbaar'),
+            ingredients: $request->array('ingredients'),
         );
 
         return to_route('recipes.show', $recipe);
@@ -51,14 +52,14 @@ final class RecipeController extends Controller
     {
         $this->authorize('view', $recipe);
 
-        return Inertia::render('recipes/Show', ['recipe' => $recipe]);
+        return Inertia::render('recipes/Show', ['recipe' => $recipe->load('ingredients')]);
     }
 
     public function edit(Recipe $recipe): Response
     {
         $this->authorize('update', $recipe);
 
-        return Inertia::render('recipes/Edit', ['recipe' => $recipe]);
+        return Inertia::render('recipes/Edit', ['recipe' => $recipe->load('ingredients')]);
     }
 
     public function update(UpdateRecipeRequest $request, Recipe $recipe, SaveRecipe $action): RedirectResponse
@@ -70,6 +71,7 @@ final class RecipeController extends Controller
             preparationMinutes: $request->integer('preparation_minutes'),
             servings: $request->integer('servings'),
             houdbaar: $request->boolean('houdbaar'),
+            ingredients: $request->array('ingredients'),
             recipe: $recipe,
         );
 
