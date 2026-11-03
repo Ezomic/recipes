@@ -68,7 +68,8 @@ it('leaves statuses outside the branded set alone', function (): void {
 });
 
 it('does not intercept a successful response', function (): void {
-    $this->get('/')
+    $this->actingAs(User::factory()->create())
+        ->get(route('recipes.index'))
         ->assertOk()
-        ->assertInertia(fn (AssertableInertia $page) => $page->component('Welcome'));
+        ->assertInertia(fn (AssertableInertia $page) => $page->component('recipes/Index'));
 });

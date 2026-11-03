@@ -15,7 +15,7 @@ it('shares workflow disabled and no portal apps in base mode', function () {
     // failed on the first clone that turned workflow mode on.
     config(['workflow.enabled' => false]);
 
-    get('/')->assertInertia(fn (Assert $page) => $page
+    get('/login')->assertInertia(fn (Assert $page) => $page
         ->where('workflow.enabled', false)
         ->where('portalApps', []));
 });
@@ -23,7 +23,7 @@ it('shares workflow disabled and no portal apps in base mode', function () {
 it('does not resolve portal apps for a guest in workflow mode', function () {
     config(['workflow.enabled' => true]);
 
-    get('/')->assertInertia(fn (Assert $page) => $page
+    get('/login')->assertInertia(fn (Assert $page) => $page
         ->where('workflow.enabled', true)
         ->where('portalApps', []));
 });
@@ -49,7 +49,7 @@ it('shares portal apps for an authenticated user in workflow mode', function () 
 
     $user = User::factory()->create(['email_verified_at' => now()]);
 
-    actingAs($user)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+    actingAs($user)->get('/recepten')->assertInertia(fn (Assert $page) => $page
         ->where('workflow.enabled', true)
         ->has('portalApps', 1)
         ->where('portalApps.0.slug', 'billr'));

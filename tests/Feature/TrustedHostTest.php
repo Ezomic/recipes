@@ -52,7 +52,7 @@ function signedIdEventTo(string $host, User $user): TestResponse
 
 it('serves requests on its own host', function (string $path) {
     $this->get('https://'.APP_HOST.$path)->assertOk();
-})->with(['/', '/login', '/up', '/health']);
+})->with(['/login', '/up', '/health']);
 
 it('refuses a request for another host', function (string $host) {
     $this->get("https://{$host}/login")->assertBadRequest();

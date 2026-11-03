@@ -214,9 +214,9 @@ it('still returns to the page that asked after a trip through ID was abandoned',
  * A Delete or a token form is not a page to return to, so RequirePassword takes the
  * Referer instead. That header is the client's to write, and it only counts when it
  * names a page of this app that answers a GET; anything else falls back to the
- * dashboard rather than becoming an open redirect.
+ * recipe list rather than becoming an open redirect.
  */
-it('falls back to the dashboard when the page that asked is not one of ours', function (string $referer) {
+it('falls back to the recipe list when the page that asked is not one of ours', function (string $referer) {
     ssoUser();
 
     $this->from($referer)->post(route('api-tokens.store'), ['name' => 'Laptop CLI'])
@@ -227,7 +227,7 @@ it('falls back to the dashboard when the page that asked is not one of ours', fu
     idSignsInAgain()->assertRedirect(route('password.confirm'));
 
     get(route('password.confirm'))
-        ->assertRedirect(route('dashboard'))
+        ->assertRedirect(route('recipes.index'))
         ->assertSessionHas('auth.password_confirmed_at');
 })->with([
     'another origin' => fn () => 'https://evil.example/settings/api-tokens',

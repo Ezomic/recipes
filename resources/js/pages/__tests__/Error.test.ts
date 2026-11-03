@@ -13,8 +13,11 @@ vi.mock('@inertiajs/vue3', () => ({
 // Wayfinder generates @/routes at build time, so the spec stubs it rather than
 // depending on `npm run build` having run.
 vi.mock('@/routes', () => ({
-    dashboard: () => '/dashboard',
     login: () => '/login',
+}));
+
+vi.mock('@/routes/recipes', () => ({
+    index: () => '/recepten',
 }));
 
 describe('Error', () => {
@@ -48,13 +51,13 @@ describe('Error', () => {
         expect(wrapper.text()).toContain('Go to login');
     });
 
-    it('sends a signed-in user back to the dashboard', () => {
+    it('sends a signed-in user back to the recipe list', () => {
         state.user = { name: 'Robbin' };
 
         const wrapper = mount(ErrorPage, { props: { status: 404 } });
 
-        expect(wrapper.get('a').attributes('href')).toBe('/dashboard');
-        expect(wrapper.text()).toContain('Back to dashboard');
+        expect(wrapper.get('a').attributes('href')).toBe('/recepten');
+        expect(wrapper.text()).toContain('Terug naar recepten');
     });
 
     it('offers a reload only on an expired page, since that is the one a retry fixes', () => {

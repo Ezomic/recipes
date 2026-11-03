@@ -16,7 +16,7 @@ import { redirect as ssoRedirect } from '@/routes/sso';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
+        title: 'Log in op je account',
     },
 });
 
@@ -33,14 +33,14 @@ const workflowEnabled = computed<boolean>(
 watchEffect(() => {
     setLayoutProps({
         description: workflowEnabled.value
-            ? 'Sign in with your Thijssensoftware account'
-            : 'Enter your email and password below to log in',
+            ? 'Log in met je Thijssensoftware-account'
+            : 'Vul hieronder je e-mailadres en wachtwoord in',
     });
 });
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Inloggen" />
 
     <div
         v-if="status"
@@ -51,7 +51,7 @@ watchEffect(() => {
 
     <div v-if="workflowEnabled" class="flex flex-col gap-6">
         <Button class="w-full" as-child>
-            <a :href="ssoRedirect().url">Sign in with Thijssensoftware</a>
+            <a :href="ssoRedirect().url">Inloggen met Thijssensoftware</a>
         </Button>
     </div>
 
@@ -66,7 +66,7 @@ watchEffect(() => {
         >
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email">E-mailadres</Label>
                     <Input
                         id="email"
                         type="email"
@@ -82,14 +82,14 @@ watchEffect(() => {
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
+                        <Label for="password">Wachtwoord</Label>
                         <TextLink
                             v-if="canResetPassword"
                             :href="request()"
                             class="text-sm"
                             :tabindex="5"
                         >
-                            Forgot your password?
+                            Wachtwoord vergeten?
                         </TextLink>
                     </div>
                     <PasswordInput
@@ -98,7 +98,7 @@ watchEffect(() => {
                         required
                         :tabindex="2"
                         autocomplete="current-password"
-                        placeholder="Password"
+                        placeholder="Wachtwoord"
                     />
                     <InputError :message="errors.password" />
                 </div>
@@ -106,7 +106,7 @@ watchEffect(() => {
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" name="remember" :tabindex="3" />
-                        <span>Remember me</span>
+                        <span>Onthoud mij</span>
                     </Label>
                 </div>
 
@@ -118,16 +118,8 @@ watchEffect(() => {
                     data-test="login-button"
                 >
                     <Spinner v-if="processing" />
-                    Log in
+                    Inloggen
                 </Button>
-            </div>
-
-            <div
-                v-if="!workflowEnabled"
-                class="text-center text-sm text-muted-foreground"
-            >
-                Don't have an account?
-                <TextLink :href="'/register'" :tabindex="5">Sign up</TextLink>
             </div>
         </Form>
     </template>
