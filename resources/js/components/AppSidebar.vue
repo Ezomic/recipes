@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, StickyNote } from '@lucide/vue';
+import { BookOpen, FolderGit2, UtensilsCrossed } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,20 +14,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import { index as notesIndex } from '@/routes/notes';
+import { index as recipesIndex } from '@/routes/recipes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Notes',
-        href: notesIndex(),
-        icon: StickyNote,
+        title: 'Recepten',
+        href: recipesIndex(),
+        icon: UtensilsCrossed,
     },
 ];
 
@@ -51,7 +45,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="recipesIndex()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

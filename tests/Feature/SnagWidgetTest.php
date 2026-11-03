@@ -26,7 +26,7 @@ it('puts the snag widget on the page for a signed-in user', function () {
     configureSnag();
     actingAs(User::factory()->create());
 
-    get(route('dashboard'))
+    get(route('recipes.index'))
         ->assertOk()
         ->assertSee('<script defer src="https://snag.example.test/widget.js" data-snag-key="web-template"', escape: false);
 });
@@ -34,7 +34,7 @@ it('puts the snag widget on the page for a signed-in user', function () {
 it('leaves the widget out while snag is switched off', function () {
     actingAs(User::factory()->create());
 
-    get(route('dashboard'))
+    get(route('recipes.index'))
         ->assertOk()
         ->assertDontSee('data-snag-key', escape: false);
 });
@@ -42,7 +42,7 @@ it('leaves the widget out while snag is switched off', function () {
 it('leaves the widget out for a signed-out visitor', function () {
     configureSnag();
 
-    get(route('home'))
+    get(route('login'))
         ->assertOk()
         ->assertDontSee('data-snag-key', escape: false);
 });

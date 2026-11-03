@@ -32,7 +32,7 @@ function nextRequestInTheSameSession(): TestResponse
 {
     Auth::forgetGuards();
 
-    return get(route('dashboard'));
+    return get(route('recipes.index'));
 }
 
 it('restores the session from the remember cookie alone', function () {

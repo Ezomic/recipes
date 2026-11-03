@@ -3,7 +3,8 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
-import { dashboard, login } from '@/routes';
+import { login } from '@/routes';
+import { index as recipesIndex } from '@/routes/recipes';
 
 const props = defineProps<{
     status: number;
@@ -88,10 +89,12 @@ function reload(): void {
                         :variant="status === 419 ? 'outline' : 'default'"
                         as-child
                     >
-                        <Link :href="isAuthenticated ? dashboard() : login()">
+                        <Link
+                            :href="isAuthenticated ? recipesIndex() : login()"
+                        >
                             {{
                                 isAuthenticated
-                                    ? 'Back to dashboard'
+                                    ? 'Terug naar recepten'
                                     : 'Go to login'
                             }}
                         </Link>

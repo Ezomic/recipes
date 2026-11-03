@@ -54,8 +54,8 @@ describe('Login', () => {
 
         expect(wrapper.find('input[name="email"]').exists()).toBe(true);
         expect(layoutProps()).toMatchObject({
-            title: 'Log in to your account',
-            description: 'Enter your email and password below to log in',
+            title: 'Log in op je account',
+            description: 'Vul hieronder je e-mailadres en wachtwoord in',
         });
     });
 
@@ -69,8 +69,8 @@ describe('Login', () => {
         expect(wrapper.find('input[name="email"]').exists()).toBe(false);
         expect(wrapper.get('a').attributes('href')).toBe('/auth/sso/redirect');
         expect(layoutProps()).toMatchObject({
-            title: 'Log in to your account',
-            description: 'Sign in with your Thijssensoftware account',
+            title: 'Log in op je account',
+            description: 'Log in met je Thijssensoftware-account',
         });
     });
 });
