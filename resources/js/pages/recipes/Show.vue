@@ -2,6 +2,7 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import RecipePhoto from '@/components/RecipePhoto.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -128,6 +129,11 @@ function remove(): void {
                 </Dialog>
             </div>
         </div>
+
+        <RecipePhoto
+            :recipe="recipe"
+            class="max-h-96 w-full rounded-xl object-cover"
+        />
 
         <section>
             <div class="mb-2 flex flex-wrap items-center justify-between gap-2">

@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { Plus } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import Paginator from '@/components/Paginator.vue';
+import RecipePhoto from '@/components/RecipePhoto.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -207,7 +208,11 @@ function toggleTag(name: string): void {
                     :href="show(recipe.id)"
                     class="flex items-center justify-between gap-4 rounded-xl border border-sidebar-border/70 p-4 hover:bg-accent"
                 >
-                    <div class="min-w-0">
+                    <RecipePhoto
+                        :recipe="recipe"
+                        class="size-16 shrink-0 rounded-lg object-cover"
+                    />
+                    <div class="min-w-0 flex-1">
                         <p class="truncate font-medium">{{ recipe.title }}</p>
                         <p class="text-sm text-muted-foreground">
                             {{ recipe.preparation_minutes }} min ·

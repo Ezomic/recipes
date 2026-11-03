@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/vue3';
 import { Plus, Trash2 } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
+import RecipePhoto from '@/components/RecipePhoto.vue';
 import TagInput from '@/components/TagInput.vue';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,6 +29,8 @@ const form = useForm({
     preparation_minutes: String(props.recipe?.preparation_minutes ?? ''),
     servings: String(props.recipe?.servings ?? ''),
     houdbaar: props.recipe?.houdbaar ?? false,
+    photo: null as File | null,
+    remove_photo: false,
     tags: props.recipe?.tags.map((tag) => tag.name) ?? [],
     ingredients: props.recipe?.ingredients.length
         ? props.recipe.ingredients.map((ingredient) => ({
@@ -81,9 +84,19 @@ function removeIngredient(position: number): void {
     form.ingredients.splice(position, 1);
 }
 
+function choosePhoto(event: Event): void {
+    form.photo = (event.target as HTMLInputElement).files?.[0] ?? null;
+
+    if (form.photo) {
+        form.remove_photo = false;
+    }
+}
+
 function submit(): void {
     if (props.recipe) {
-        form.put(update(props.recipe.id).url);
+        form.transform((data) => ({ ...data, _method: 'put' })).post(
+            update(props.recipe.id).url,
+        );
     } else {
         form.post(store().url);
     }
@@ -127,6 +140,34 @@ function submit(): void {
             <Label for="houdbaar">Houdbaar (bewaren zonder koelkast)</Label>
         </div>
         <InputError :message="form.errors.houdbaar" />
+
+        <div class="grid gap-2">
+            <Label for="photo">{{
+                recipe?.photo_version ? 'Foto vervangen' : 'Foto'
+            }}</Label>
+            <RecipePhoto
+                v-if="recipe?.photo_version"
+                :recipe="recipe"
+                class="max-h-40 w-fit max-w-full rounded-lg object-cover"
+            />
+            <input
+                id="photo"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="block w-full text-sm file:mr-3 file:rounded-md file:border file:border-input file:bg-transparent file:px-3 file:py-1.5 file:text-sm file:font-medium"
+                @change="choosePhoto"
+            />
+            <InputError :message="form.errors.photo" />
+            <div v-if="recipe?.photo_version" class="flex items-center gap-2">
+                <Checkbox
+                    id="remove_photo"
+                    v-model="form.remove_photo"
+                    :disabled="form.photo !== null"
+                />
+                <Label for="remove_photo">Foto verwijderen</Label>
+            </div>
+            <InputError :message="form.errors.remove_photo" />
+        </div>
 
         <div class="grid gap-2">
             <Label for="new-tag">Tags</Label>

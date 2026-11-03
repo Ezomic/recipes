@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\Recipes\DeleteUserRecipePhotos;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
@@ -52,7 +53,7 @@ final class ProfileController extends Controller
     /**
      * Delete the user's profile.
      */
-    public function destroy(ProfileDeleteRequest $request): RedirectResponse
+    public function destroy(ProfileDeleteRequest $request, DeleteUserRecipePhotos $deletePhotos): RedirectResponse
     {
         $user = $request->user();
         abort_unless($user instanceof User, 403);
@@ -60,6 +61,7 @@ final class ProfileController extends Controller
         Auth::logout();
 
         $user->delete();
+        $deletePhotos->handle($user);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -38,6 +38,7 @@ export type Recipe = {
     preparation_minutes: number;
     servings: number;
     houdbaar: boolean;
+    photo_version: string | null;
     created_at: string;
     updated_at: string;
     tags: Tag[];

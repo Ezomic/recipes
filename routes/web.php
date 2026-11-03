@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\RecipePhotoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ Route::get('/', fn () => redirect()->route(Auth::check() ? 'recipes.index' : 'lo
 Route::get('health', HealthController::class)->name('health');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('recepten/{recipe}/foto', RecipePhotoController::class)->name('recipes.photo');
     Route::resource('recepten', RecipeController::class)
         ->parameters(['recepten' => 'recipe'])
         ->names('recipes');

@@ -14,6 +14,7 @@ vi.mock('@/routes/recipes', () => ({
     index: () => '/recepten',
     edit: (id: number) => `/recepten/${id}/edit`,
     destroy: (id: number) => ({ url: `/recepten/${id}` }),
+    photo: (id: number) => ({ url: `/recepten/${id}/foto` }),
 }));
 
 const recipe: RecipeWithIngredients = {
@@ -23,6 +24,7 @@ const recipe: RecipeWithIngredients = {
     preparation_minutes: 45,
     servings: 4,
     houdbaar: false,
+    photo_version: null,
     created_at: '',
     updated_at: '',
     tags: [
@@ -126,5 +128,20 @@ describe('recipes/Show', () => {
             props: { recipe: { ...recipe, tags: [] } },
         });
         expect(bare.findAll('[data-testid="recipe-tag"]')).toHaveLength(0);
+    });
+
+    it('shows the photo above the details when the recipe has one', () => {
+        const wrapper = mount(Show, {
+            props: { recipe: { ...recipe, photo_version: 'abc' } },
+        });
+
+        expect(wrapper.find('img').attributes('alt')).toBe('Foto van Soep');
+        expect(wrapper.find('img').attributes('loading')).toBe('lazy');
+    });
+
+    it('shows no image for a recipe without a photo', () => {
+        expect(mount(Show, { props: { recipe } }).find('img').exists()).toBe(
+            false,
+        );
     });
 });

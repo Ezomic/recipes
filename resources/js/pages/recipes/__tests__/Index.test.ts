@@ -16,6 +16,7 @@ vi.mock('@/routes/recipes', () => ({
     index: () => ({ url: '/recepten', toString: () => '/recepten' }),
     create: () => '/recepten/create',
     show: (id: number) => `/recepten/${id}`,
+    photo: (id: number) => ({ url: `/recepten/${id}/foto` }),
 }));
 
 const soup: Recipe = {
@@ -25,6 +26,7 @@ const soup: Recipe = {
     preparation_minutes: 20,
     servings: 4,
     houdbaar: true,
+    photo_version: null,
     created_at: '',
     updated_at: '',
     tags: [
@@ -247,5 +249,15 @@ describe('recipes/Index', () => {
         expect(
             wrapper.find<HTMLInputElement>('#max-minutes').element.value,
         ).toBe('');
+    });
+
+    it('shows a thumbnail only for recipes with a photo', () => {
+        const wrapper = render([
+            soup,
+            { ...soup, id: 2, photo_version: 'abc' },
+        ]);
+
+        expect(wrapper.findAll('img')).toHaveLength(1);
+        expect(wrapper.find('img').attributes('src')).toBe('/recepten/2/foto');
     });
 });
