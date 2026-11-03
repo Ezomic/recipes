@@ -6,6 +6,7 @@ import type { RecipeWithIngredients } from '@/types';
 
 defineProps<{
     recipe: RecipeWithIngredients;
+    knownTags: string[];
 }>();
 
 defineOptions({
@@ -21,6 +22,6 @@ defineOptions({
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
         <h1 class="text-xl font-semibold">Recept bewerken</h1>
 
-        <RecipeForm :recipe="recipe" />
+        <RecipeForm :recipe="recipe" :known-tags="knownTags" />
     </div>
 </template>

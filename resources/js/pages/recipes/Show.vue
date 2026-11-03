@@ -78,9 +78,19 @@ function remove(): void {
                     {{ recipe.preparation_minutes }} minuten ·
                     {{ recipe.servings }} porties
                 </p>
-                <Badge v-if="recipe.houdbaar" variant="secondary" class="mt-2">
-                    Houdbaar
-                </Badge>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <Badge v-if="recipe.houdbaar" variant="secondary">
+                        Houdbaar
+                    </Badge>
+                    <Badge
+                        v-for="tag in recipe.tags"
+                        :key="tag.id"
+                        variant="outline"
+                        data-testid="recipe-tag"
+                    >
+                        {{ tag.name }}
+                    </Badge>
+                </div>
             </div>
 
             <div class="flex shrink-0 items-center gap-2">

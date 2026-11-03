@@ -6,15 +6,19 @@ namespace App\Actions\Recipes;
 
 use App\Enums\IngredientUnit;
 use App\Models\Recipe;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class SaveRecipe
 {
+    public function __construct(private readonly PruneUnusedTags $pruneUnusedTags = new PruneUnusedTags) {}
+
     /**
      * @param  array<array-key, mixed>  $steps
      * @param  array<array-key, mixed>  $ingredients
+     * @param  array<array-key, mixed>  $tags
      */
     public function handle(
         User $user,
@@ -24,9 +28,10 @@ final class SaveRecipe
         int $servings,
         bool $houdbaar,
         array $ingredients,
+        array $tags = [],
         ?Recipe $recipe = null,
     ): Recipe {
-        return DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $recipe): Recipe {
+        return DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $tags, $recipe): Recipe {
             $recipe ??= $user->recipes()->make();
 
             if ($recipe->exists) {
@@ -45,8 +50,40 @@ final class SaveRecipe
             $recipe->ingredients()->createMany($this->cleanIngredients($ingredients));
             $recipe->unsetRelation('ingredients');
 
+            $recipe->tags()->sync($this->resolveTags($user, $tags));
+            $recipe->unsetRelation('tags');
+            $this->pruneUnusedTags->handle($user);
+
             return $recipe;
         });
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $tags
+     * @return list<int>
+     */
+    private function resolveTags(User $user, array $tags): array
+    {
+        $names = [];
+
+        foreach ($tags as $tag) {
+            $name = is_string($tag) ? Tag::normalise($tag) : '';
+
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        $existing = $user->tags()->whereIn('name', $names)->get()->keyBy('name');
+        $ids = [];
+
+        foreach ($names as $name) {
+            $ids[] = ($existing[$name] ?? $user->tags()->create(['name' => $name]))->id;
+        }
+
+        return $ids;
     }
 
     /**

@@ -18,6 +18,19 @@ export type Ingredient = {
     name: string;
 };
 
+export type Tag = {
+    id: number;
+    name: string;
+};
+
+export type RecipeFilters = {
+    q: string | null;
+    tag: string[];
+    max_minutes: number | null;
+    houdbaar: boolean;
+    active: boolean;
+};
+
 export type Recipe = {
     id: number;
     title: string;
@@ -27,6 +40,7 @@ export type Recipe = {
     houdbaar: boolean;
     created_at: string;
     updated_at: string;
+    tags: Tag[];
 };
 
 export type RecipeWithIngredients = Recipe & {
