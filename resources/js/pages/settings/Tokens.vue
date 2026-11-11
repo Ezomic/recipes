@@ -19,7 +19,7 @@ defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'API tokens', href: index() }],
+        breadcrumbs: [{ title: 'API-tokens', href: index() }],
     },
 });
 
@@ -40,23 +40,23 @@ function revoke(id: number): void {
 </script>
 
 <template>
-    <Head title="API tokens" />
+    <Head title="API-tokens" />
 
-    <h1 class="sr-only">API tokens</h1>
+    <h1 class="sr-only">API-tokens</h1>
 
     <div class="space-y-6">
         <Heading
             variant="small"
-            title="API tokens"
-            description="Tokens authenticate as you against the API. Treat them like passwords."
+            title="API-tokens"
+            description="Met een token log je in bij de API. Behandel het als een wachtwoord."
         />
 
         <!-- Rendered from a session flash, so it is here for exactly one render.
              Only a hash is stored, so this is the only chance to copy it. -->
         <Alert v-if="createdToken">
-            <AlertTitle>Copy your token now</AlertTitle>
+            <AlertTitle>Kopieer je token nu</AlertTitle>
             <AlertDescription class="space-y-3">
-                <p>This is the only time it will be shown.</p>
+                <p>Dit is de enige keer dat het getoond wordt.</p>
                 <div class="flex w-full items-center gap-2">
                     <code
                         class="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-xs"
@@ -67,12 +67,12 @@ function revoke(id: number): void {
                     <Button
                         size="sm"
                         variant="outline"
-                        :aria-label="copied ? 'Copied' : 'Copy token'"
+                        :aria-label="copied ? 'Gekopieerd' : 'Kopieer token'"
                         @click="copy(createdToken)"
                     >
                         <Check v-if="copied" class="size-4" />
                         <Copy v-else class="size-4" />
-                        {{ copied ? 'Copied' : 'Copy' }}
+                        {{ copied ? 'Gekopieerd' : 'Kopieer' }}
                     </Button>
                 </div>
             </AlertDescription>
@@ -85,18 +85,18 @@ function revoke(id: number): void {
             #default="{ errors, processing }"
         >
             <div class="grid flex-1 gap-2">
-                <Label for="name">Token name</Label>
+                <Label for="name">Naam van het token</Label>
                 <Input
                     id="name"
                     name="name"
-                    placeholder="e.g. Laptop CLI"
+                    placeholder="bijv. Laptop CLI"
                     required
                 />
                 <InputError :message="errors.name" />
             </div>
             <Button type="submit" :disabled="processing">
                 <Spinner v-if="processing" />
-                Create token
+                Token aanmaken
             </Button>
         </Form>
 
@@ -105,7 +105,7 @@ function revoke(id: number): void {
                 v-if="tokens.length === 0"
                 class="p-6 text-center text-sm text-muted-foreground"
             >
-                No tokens yet.
+                Nog geen tokens.
             </p>
 
             <div
@@ -117,18 +117,18 @@ function revoke(id: number): void {
                 <div class="min-w-0">
                     <p class="truncate font-medium">{{ token.name }}</p>
                     <p class="text-sm text-muted-foreground">
-                        Created {{ token.created_at_diff }} &middot;
+                        Aangemaakt {{ token.created_at_diff }} &middot;
                         {{
                             token.last_used_at_diff
-                                ? `last used ${token.last_used_at_diff}`
-                                : 'never used'
+                                ? `laatst gebruikt ${token.last_used_at_diff}`
+                                : 'nooit gebruikt'
                         }}
                         <template v-if="token.expires_at_diff">
                             &middot;
                             <span
                                 :class="{ 'text-destructive': token.expired }"
                             >
-                                {{ token.expired ? 'expired' : 'expires' }}
+                                {{ token.expired ? 'verlopen' : 'verloopt' }}
                                 {{ token.expires_at_diff }}
                             </span>
                         </template>
@@ -137,7 +137,7 @@ function revoke(id: number): void {
                 <Button
                     variant="ghost"
                     size="icon"
-                    :aria-label="`Revoke ${token.name}`"
+                    :aria-label="`${token.name} intrekken`"
                     @click="revoke(token.id)"
                 >
                     <Trash2 class="size-4" />

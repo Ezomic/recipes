@@ -59,7 +59,7 @@ final class ApiTokenController extends Controller
 
         abort_unless($action->handle($user, $token), 404);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Token revoked.')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Token ingetrokken.']);
 
         return to_route('api-tokens.index');
     }

@@ -10,7 +10,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Security settings',
+                title: 'Beveiligingsinstellingen',
                 href: edit(),
             },
         ],
@@ -19,9 +19,9 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Security settings" />
+    <Head title="Beveiligingsinstellingen" />
 
-    <h1 class="sr-only">Security settings</h1>
+    <h1 class="sr-only">Beveiligingsinstellingen</h1>
 
     <ManagePasskeys
         :canManagePasskeys="canManagePasskeys"

@@ -26,10 +26,10 @@ describe('Error', () => {
     });
 
     it.each([
-        [403, 'Forbidden'],
-        [404, 'Page not found'],
-        [419, 'Page expired'],
-        [500, 'Something went wrong'],
+        [403, 'Geen toegang'],
+        [404, 'Pagina niet gevonden'],
+        [419, 'Pagina verlopen'],
+        [500, 'Er ging iets mis'],
     ])('titles a %i with its own copy', (status, title) => {
         const wrapper = mount(ErrorPage, { props: { status } });
 
@@ -40,7 +40,7 @@ describe('Error', () => {
     it('falls back to generic copy for an unmapped status', () => {
         const wrapper = mount(ErrorPage, { props: { status: 502 } });
 
-        expect(wrapper.find('h1').text()).toBe('Something went wrong');
+        expect(wrapper.find('h1').text()).toBe('Er ging iets mis');
         expect(wrapper.text()).toContain('502');
     });
 
@@ -48,7 +48,7 @@ describe('Error', () => {
         const wrapper = mount(ErrorPage, { props: { status: 404 } });
 
         expect(wrapper.get('a').attributes('href')).toBe('/login');
-        expect(wrapper.text()).toContain('Go to login');
+        expect(wrapper.text()).toContain('Naar inloggen');
     });
 
     it('sends a signed-in user back to the recipe list', () => {
@@ -62,11 +62,11 @@ describe('Error', () => {
 
     it('offers a reload only on an expired page, since that is the one a retry fixes', () => {
         expect(mount(ErrorPage, { props: { status: 419 } }).text()).toContain(
-            'Reload the page',
+            'Pagina opnieuw laden',
         );
         expect(
             mount(ErrorPage, { props: { status: 404 } }).text(),
-        ).not.toContain('Reload the page');
+        ).not.toContain('Pagina opnieuw laden');
     });
 
     it('reloads the window when the reload button is pressed', async () => {

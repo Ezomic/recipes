@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
 import { router } from '@inertiajs/vue3';
+import { ChevronLeft, ChevronRight } from '@lucide/vue';
 import {
     Pagination,
     PaginationContent,
@@ -37,7 +38,7 @@ function go(page: number): void {
         class="flex flex-col items-center justify-between gap-3 sm:flex-row"
     >
         <p class="text-sm text-muted-foreground">
-            Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }}
+            {{ meta.from }} tot {{ meta.to }} van {{ meta.total }}
         </p>
 
         <Pagination
@@ -50,7 +51,10 @@ function go(page: number): void {
             @update:page="go"
         >
             <PaginationContent v-slot="{ items }">
-                <PaginationPrevious />
+                <PaginationPrevious>
+                    <ChevronLeft />
+                    <span class="hidden sm:block">Vorige</span>
+                </PaginationPrevious>
 
                 <template v-for="(item, index) in items">
                     <PaginationItem
@@ -64,7 +68,10 @@ function go(page: number): void {
                     <PaginationEllipsis v-else :key="`ellipsis-${index}`" />
                 </template>
 
-                <PaginationNext />
+                <PaginationNext>
+                    <span class="hidden sm:block">Volgende</span>
+                    <ChevronRight />
+                </PaginationNext>
             </PaginationContent>
         </Pagination>
     </div>

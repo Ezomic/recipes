@@ -37,23 +37,24 @@ const apps = computed<PortalApp[]>(() => page.props.portalApps ?? []);
                             variant="ghost"
                             size="icon"
                             class="size-8"
-                            aria-label="Switch app"
+                            aria-label="Wissel van app"
                         >
                             <LayoutGrid class="size-4" />
                         </Button>
                     </DialogTrigger>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Switch app</p>
+                    <p>Wissel van app</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
 
         <DialogContent class="sm:max-w-lg">
             <DialogHeader>
-                <DialogTitle>Your apps</DialogTitle>
+                <DialogTitle>Jouw apps</DialogTitle>
                 <DialogDescription>
-                    Jump to another Thijssensoftware app you have access to.
+                    Ga naar een andere Thijssensoftware-app waar je toegang toe
+                    hebt.
                 </DialogDescription>
             </DialogHeader>
 
@@ -61,7 +62,7 @@ const apps = computed<PortalApp[]>(() => page.props.portalApps ?? []);
                 v-if="apps.length === 0"
                 class="py-8 text-center text-sm text-muted-foreground"
             >
-                No other apps available.
+                Geen andere apps beschikbaar.
             </p>
 
             <div v-else class="grid grid-cols-2 gap-2 sm:grid-cols-3">

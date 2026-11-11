@@ -43,7 +43,7 @@ describe('Paginator', () => {
     it('summarises the slice being shown', () => {
         const wrapper = mount(Paginator, { props: { meta: paginated() } });
 
-        expect(wrapper.text()).toContain('Showing 6 to 10 of 20');
+        expect(wrapper.text()).toContain('6 tot 10 van 20');
     });
 
     it('navigates to the page that was clicked', async () => {

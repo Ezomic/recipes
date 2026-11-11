@@ -26,22 +26,22 @@ const workflowEnabled = computed<boolean>(
     <div class="space-y-6">
         <Heading
             variant="small"
-            title="Delete account"
-            description="Delete your account and all of its resources"
+            title="Account verwijderen"
+            description="Verwijder je account en alle bijbehorende gegevens"
         />
         <div
             class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
         >
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
-                <p class="font-medium">Warning</p>
+                <p class="font-medium">Waarschuwing</p>
                 <p class="text-sm">
-                    Please proceed with caution, this cannot be undone.
+                    Let op, dit kan niet ongedaan worden gemaakt.
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
                     <Button variant="destructive" data-test="delete-user-button"
-                        >Delete account</Button
+                        >Account verwijderen</Button
                     >
                 </DialogTrigger>
                 <DialogContent>
@@ -56,17 +56,17 @@ const workflowEnabled = computed<boolean>(
                     >
                         <DialogHeader class="space-y-3">
                             <DialogTitle
-                                >Are you sure you want to delete your
-                                account?</DialogTitle
+                                >Weet je zeker dat je je account wilt
+                                verwijderen?</DialogTitle
                             >
                             <DialogDescription>
-                                Once your account is deleted, all of its
-                                resources and data will also be permanently
-                                deleted.
+                                Zodra je account is verwijderd, worden ook alle
+                                bijbehorende gegevens definitief verwijderd.
                                 <template v-if="workflowEnabled">
-                                    To confirm it is you, Thijssensoftware ID
-                                    may ask you to sign in again first and then
-                                    bring you back here to delete it.
+                                    Om te bevestigen dat jij het bent, vraagt
+                                    Thijssensoftware ID je misschien eerst
+                                    opnieuw in te loggen en brengt je daarna
+                                    terug om het account te verwijderen.
                                 </template>
                             </DialogDescription>
                         </DialogHeader>
@@ -82,7 +82,7 @@ const workflowEnabled = computed<boolean>(
                                         }
                                     "
                                 >
-                                    Cancel
+                                    Annuleren
                                 </Button>
                             </DialogClose>
 
@@ -92,7 +92,7 @@ const workflowEnabled = computed<boolean>(
                                 :disabled="processing"
                                 data-test="confirm-delete-user-button"
                             >
-                                Delete account
+                                Account verwijderen
                             </Button>
                         </DialogFooter>
                     </Form>

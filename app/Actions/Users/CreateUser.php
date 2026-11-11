@@ -30,7 +30,7 @@ final class CreateUser
         return DB::transaction(function () use ($input): User {
             if (User::query()->lockForUpdate()->exists()) {
                 throw ValidationException::withMessages([
-                    'email' => 'A user already exists. This app has exactly one login.',
+                    'email' => 'Er bestaat al een gebruiker. Deze app heeft precies één login.',
                 ]);
             }
 
