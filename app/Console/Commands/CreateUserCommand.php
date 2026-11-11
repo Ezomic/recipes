@@ -8,8 +8,6 @@ use App\Actions\Users\CreateUser;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 
-use function Laravel\Prompts\password;
-
 final class CreateUserCommand extends Command
 {
     protected $signature = 'user:create {name : Display name} {email : Login email}';
@@ -22,7 +20,6 @@ final class CreateUserCommand extends Command
             $user = $action->handle(
                 (string) $this->argument('name'),
                 (string) $this->argument('email'),
-                password(label: 'Password', required: true),
             );
         } catch (ValidationException $exception) {
             foreach ($exception->validator->errors()->all() as $message) {
@@ -32,7 +29,7 @@ final class CreateUserCommand extends Command
             return self::FAILURE;
         }
 
-        $this->components->info("Created {$user->email}.");
+        $this->components->info("Created {$user->email}. They sign in with a code mailed to that address.");
 
         return self::SUCCESS;
     }

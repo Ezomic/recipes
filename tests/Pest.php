@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Testing\TestResponse;
 use Laravel\Socialite\Contracts\Factory as Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -14,6 +19,7 @@ use Tests\TestCase;
 use function Pest\Laravel\call;
 use function Pest\Laravel\get;
 use function Pest\Laravel\mock;
+use function Pest\Laravel\post;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,4 +106,52 @@ function returnWithOnlyTheRememberCookie(string $recaller, ?string $url = null):
     Auth::forgetGuards();
 
     return test()->withCookie(Auth::guard()->getRecallerName(), $recaller)->get($url ?? route('recipes.index'));
+}
+
+function fakeZero(int|Closure $response = 202): void
+{
+    Http::swap(new HttpFactory);
+    Http::fake(['zero.test/*' => $response instanceof Closure ? $response : Http::response([], $response)]);
+}
+
+function sentLoginCode(): string
+{
+    $sent = Http::recorded()->map(fn (array $pair): string => (string) $pair[0]['text'])->last();
+
+    preg_match('/\b(\d{6})\b/', (string) $sent, $matches);
+
+    return $matches[1] ?? throw new LogicException('No login code was sent.');
+}
+
+/**
+ * @return TestResponse<Response>
+ */
+function requestLoginCode(mixed $email): TestResponse
+{
+    return post(route('login.code.send'), ['email' => $email]);
+}
+
+function firstError(string $key): string
+{
+    $errors = session('errors');
+
+    return $errors instanceof ViewErrorBag ? $errors->first($key) : '';
+}
+
+/**
+ * Everything logged from now on, as one string, to prove no secret reaches a log.
+ *
+ * @return Closure(): string
+ */
+function captureLogs(): Closure
+{
+    $lines = [];
+
+    Event::listen(MessageLogged::class, function (MessageLogged $event) use (&$lines): void {
+        $lines[] = $event->message.' '.json_encode($event->context);
+    });
+
+    return function () use (&$lines): string {
+        return implode("\n", $lines);
+    };
 }

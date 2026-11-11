@@ -29,10 +29,13 @@ it('sends a signed-in user from the front door to the recipe list', function () 
     $this->get('/')->assertRedirect(route('recipes.index'));
 });
 
-it('lands a user on the recipe list after logging in', function () {
+it('lands a user on the recipe list after logging in with a code', function () {
     $user = User::factory()->create();
+    fakeZero();
 
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
+    requestLoginCode($user->email);
+
+    $this->post(route('login.store'), ['email' => $user->email, 'code' => sentLoginCode()])
         ->assertRedirect(route('recipes.index', absolute: false));
 });
 

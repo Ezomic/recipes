@@ -25,8 +25,8 @@ use Symfony\Component\HttpFoundation\Response;
  * mode then fail to build. See WEB-23.
  *
  * The same goes for every other credential the app could hold for a user:
- * passkeys (their sign-in is a guest route of its own), two-factor, changing a
- * password, and the Security page that manages them. Once confirming through
+ * the emailed login code and link, passkeys (their sign-in is a guest route of
+ * its own), and the Security page that manages them. Once confirming through
  * ID unlocked the pages behind RequirePassword (WEB-28), a passkey enrolled
  * there would have been a way in that never touches ID.
  */
@@ -36,18 +36,14 @@ final class BlockLocalCredentials
      * @var list<string>
      */
     private const BLOCKED = [
-        'password.request',
-        'password.email',
-        'password.reset',
-        'password.update',
         'login.store',
+        'login.code.send',
+        'login.link',
         // Confirmation goes through ID instead (WEB-28), so a local password set before
         // the switch to workflow mode cannot stand in for it.
         'password.confirm.store',
         'passkey.*',
-        'two-factor.*',
         'security.edit',
-        'user-password.update',
         'well-known.passkeys',
     ];
 

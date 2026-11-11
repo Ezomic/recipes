@@ -19,18 +19,10 @@ function requestWithSession(array $session = [], array $query = []): Request
     return $request;
 }
 
-it('throttles two factor attempts by the login id in session', function () {
-    $limiter = RateLimiter::limiter('two-factor');
+it('throttles code verification by ip', function () {
+    $limiter = RateLimiter::limiter('login-code-verify');
 
-    expect($limiter(requestWithSession(['login.id' => 42])))
-        ->toBeInstanceOf(Limit::class);
-});
-
-it('throttles login attempts by username and ip', function () {
-    $limiter = RateLimiter::limiter('login');
-
-    expect($limiter(requestWithSession([], ['email' => 'User@Example.com'])))
-        ->toBeInstanceOf(Limit::class);
+    expect($limiter(requestWithSession())->key)->toBe('login-verify:127.0.0.1');
 });
 
 it('throttles passkey attempts by credential id', function () {

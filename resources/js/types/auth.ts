@@ -4,7 +4,6 @@ export type User = {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
-    two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
@@ -23,9 +22,3 @@ export type Passkey = {
     last_used_at_diff: string | null;
 };
 /* @end-chisel-passkeys */
-
-export type TwoFactorConfigContent = {
-    title: string;
-    description: string;
-    buttonText: string;
-};

@@ -12,8 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * RequirePassword in workflow mode only, where it is a fresh trip through ID (WEB-28).
- * A route that asks for the current password itself in base mode needs nothing more
- * there, and confirming on a separate page first would only make the user type it twice.
+ * Base mode has no password to confirm with, so it asks for nothing there.
  */
 final class RequirePasswordInWorkflowMode
 {

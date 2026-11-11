@@ -14,7 +14,7 @@ import type { NavItem } from '@/types';
 
 const page = usePage();
 
-// Security is password, two-factor and passkeys, all of which ID owns in workflow mode.
+// Security is passkeys, which ID owns in workflow mode.
 const sidebarNavItems = computed<NavItem[]>(() => [
     {
         title: 'Profile',

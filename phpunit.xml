@@ -40,6 +40,8 @@
              explicitly and fake the HTTP client. -->
         <env name="FLARE_ENABLED" value="false"/>
         <env name="FLARE_KEY" value=""/>
+        <env name="ZERO_URL" value="https://zero.test" force="true"/>
+        <env name="ZERO_OUTBOUND_TOKEN" value="zob_test_token_value" force="true"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
