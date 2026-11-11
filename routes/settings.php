@@ -6,7 +6,6 @@ use App\Http\Controllers\Settings\ApiTokenController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Middleware\RequirePasswordInWorkflowMode;
-use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,26 +17,19 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Base mode confirms with the current password in the request. A user signed in
-    // through ID has none, so there it takes a fresh trip through ID instead (WEB-31).
+    // Base mode has no password to confirm with. A user signed in through ID takes a
+    // fresh trip through ID instead (WEB-31).
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])
         ->middleware(RequirePasswordInWorkflowMode::class)
         ->name('profile.destroy');
 
-    Route::get('settings/security', [SecurityController::class, 'edit'])
-        ->middleware(RequirePassword::class)
-        ->name('security.edit');
-
-    Route::put('settings/password', [SecurityController::class, 'update'])
-        ->middleware('throttle:6,1')
-        ->name('user-password.update');
+    Route::get('settings/security', [SecurityController::class, 'edit'])->name('security.edit');
 
     Route::get('settings/appearance', fn () => Inertia::render('settings/Appearance'))->name('appearance.edit');
 
-    // Behind RequirePassword like the security page: a personal access token is
-    // a full-access credential, so minting one from a hijacked session should
-    // still cost the password.
-    Route::middleware(RequirePassword::class)->group(function () {
+    // A personal access token is a full-access credential. There is no password to
+    // confirm with in base mode, so only workflow mode asks again (through ID).
+    Route::middleware(RequirePasswordInWorkflowMode::class)->group(function () {
         Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
         Route::post('settings/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
         Route::delete('settings/api-tokens/{token}', [ApiTokenController::class, 'destroy'])

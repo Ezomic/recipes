@@ -92,15 +92,11 @@ it('asks a confirmed workflow user for no password', function () {
     expect($user->fresh())->toBeNull();
 });
 
-it('keeps the current password as the confirmation in base mode, with no trip anywhere', function () {
+it('asks for nothing in base mode, which has no password and no trip anywhere', function () {
     $user = User::factory()->create();
     actingAs($user);
 
-    $this->from(route('profile.edit'))->delete(route('profile.destroy'))
-        ->assertSessionHasErrors('password')
-        ->assertRedirect(route('profile.edit'));
-
-    $this->delete(route('profile.destroy'), ['password' => 'password'])
+    $this->delete(route('profile.destroy'))
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('home'));
 

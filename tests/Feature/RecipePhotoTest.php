@@ -408,7 +408,7 @@ it('deletes every photo of a user when the account is deleted', function () {
     recipeWithPhoto($user);
     recipeWithPhoto($other);
 
-    actingAs($user)->delete(route('profile.destroy'), ['password' => 'password'])->assertRedirect('/');
+    actingAs($user)->delete(route('profile.destroy'))->assertRedirect('/');
 
     expect(storedPhotos())->toBe(["recipe-photos/{$other->id}/old.jpg"]);
 });

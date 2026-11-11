@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Support\Facades\URL;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -21,17 +22,18 @@ it('blocks the local credential routes in workflow mode', function (string $meth
 
     $response->assertNotFound();
 })->with([
-    ['get', 'password.request'],
-    ['post', 'password.email'],
-    ['get', 'password.reset'],
-    ['post', 'password.update'],
     ['post', 'login.store'],
+    ['post', 'login.code.send'],
     ['get', 'passkey.login-options'],
     ['post', 'passkey.login'],
-    ['get', 'two-factor.login'],
-    ['post', 'two-factor.login.store'],
     ['get', 'well-known.passkeys'],
 ]);
+
+it('blocks the emailed login link in workflow mode, even when correctly signed', function () {
+    config(['workflow.enabled' => true]);
+
+    get(URL::temporarySignedRoute('login.link', now()->addMinutes(5), ['token' => 'x']))->assertNotFound();
+});
 
 /**
  * The rest need a signed-in user whose password counts as confirmed, which is what
@@ -52,21 +54,13 @@ it('blocks managing local credentials in workflow mode', function (string $metho
     ['POST', 'passkey.store', []],
     ['GET', 'passkey.confirm-options', []],
     ['POST', 'passkey.confirm', []],
-    ['POST', 'two-factor.enable', []],
-    ['DELETE', 'two-factor.disable', []],
-    ['POST', 'two-factor.confirm', []],
-    ['GET', 'two-factor.qr-code', []],
-    ['GET', 'two-factor.secret-key', []],
-    ['GET', 'two-factor.recovery-codes', []],
-    ['POST', 'two-factor.regenerate-recovery-codes', []],
     ['GET', 'security.edit', []],
-    ['PUT', 'user-password.update', []],
 ]);
 
 it('leaves the local credential routes alone for a standalone app', function () {
     config(['workflow.enabled' => false]);
 
-    get(route('password.request'))->assertOk();
+    post(route('login.code.send'), ['email' => 'nobody@example.com'])->assertRedirect(route('login'));
 });
 
 /**

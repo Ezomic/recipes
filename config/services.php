@@ -37,6 +37,11 @@ return [
         ],
     ],
 
+    'zero' => [
+        'url' => env('ZERO_URL'),
+        'token' => env('ZERO_OUTBOUND_TOKEN'),
+    ],
+
     'thijssensoftware' => [
         'base_url' => env('THIJSSENSOFTWARE_ID_URL', 'https://id.thijssensoftware.nl'),
         'client_id' => env('THIJSSENSOFTWARE_ID_CLIENT_ID'),

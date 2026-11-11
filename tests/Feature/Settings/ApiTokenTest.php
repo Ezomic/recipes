@@ -12,16 +12,11 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 
-/**
- * The pages sit behind RequirePassword, so every test confirms the password
- * first. That middleware is itself asserted separately below.
- */
 function tokenUser(): User
 {
     $user = User::factory()->create(['email_verified_at' => now()]);
 
     actingAs($user);
-    session()->put('auth.password_confirmed_at', time());
 
     return $user;
 }
@@ -30,10 +25,10 @@ it('requires authentication', function () {
     $this->get('/settings/api-tokens')->assertRedirect('/login');
 });
 
-it('requires a recently confirmed password', function () {
+it('asks for no password confirmation in base mode, which has no password', function () {
     actingAs(User::factory()->create(['email_verified_at' => now()]));
 
-    $this->get('/settings/api-tokens')->assertRedirect(route('password.confirm'));
+    $this->get('/settings/api-tokens')->assertOk();
 });
 
 it('lists the acting user’s tokens and nobody else’s', function () {
@@ -208,7 +203,6 @@ it('shows when each token expires, and that it has', function () {
     $this->travel(30)->days();
     app(CreateApiToken::class)->handle($user, 'New');
     $this->travel(61)->days();
-    session()->put('auth.password_confirmed_at', now()->getTimestamp());
 
     $this->get('/settings/api-tokens')
         ->assertInertia(fn (Assert $page) => $page

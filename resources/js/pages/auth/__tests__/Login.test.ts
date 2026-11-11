@@ -9,7 +9,9 @@ const state = vi.hoisted(() => ({
 
 vi.mock('@inertiajs/vue3', () => ({
     Form: {
-        template: '<form><slot :errors="{}" :processing="false" /></form>',
+        props: ['action', 'method'],
+        template:
+            '<form :data-action="action"><slot :errors="{}" :processing="false" /></form>',
     },
     Head: { template: '<span />' },
     Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -19,14 +21,16 @@ vi.mock('@inertiajs/vue3', () => ({
     }),
 }));
 
-vi.mock('@/routes/login', () => ({ store: { form: () => ({}) } }));
-vi.mock('@/routes/password', () => ({ request: () => '/forgot-password' }));
+vi.mock('@/routes/login', () => ({
+    store: { form: () => ({ action: '/login', method: 'post' }) },
+}));
+vi.mock('@/routes/login/code', () => ({
+    send: { form: () => ({ action: '/login/code', method: 'post' }) },
+}));
 vi.mock('@/routes/sso', () => ({
     redirect: () => ({ url: '/auth/sso/redirect' }),
 }));
 
-// What AuthLayout receives: the page's static layout options, overridden by
-// whatever it passed to setLayoutProps, the same merge Inertia applies.
 function layoutProps(): Record<string, unknown> {
     const { layout } = Login as { layout?: Record<string, unknown> };
 
@@ -36,9 +40,9 @@ function layoutProps(): Record<string, unknown> {
     );
 }
 
-function mountLogin() {
+function mountLogin(email: string | null = null) {
     return mount(Login, {
-        props: { canResetPassword: true },
+        props: { email },
         global: { stubs: { PasskeyVerify: true } },
     });
 }
@@ -49,18 +53,86 @@ describe('Login', () => {
         state.setLayoutProps.mockClear();
     });
 
-    it('asks for email and password in base mode', () => {
+    it('first asks only for the email address', () => {
         const wrapper = mountLogin();
 
         expect(wrapper.find('input[name="email"]').exists()).toBe(true);
+        expect(wrapper.find('input[name="code"]').exists()).toBe(false);
+        expect(wrapper.find('input[name="password"]').exists()).toBe(false);
+        expect(wrapper.get('form').attributes('data-action')).toBe(
+            '/login/code',
+        );
         expect(layoutProps()).toMatchObject({
             title: 'Log in op je account',
-            description: 'Vul hieronder je e-mailadres en wachtwoord in',
+            description:
+                'Vul je e-mailadres in, dan sturen we je een inlogcode',
         });
     });
 
-    // Only the SSO button renders in workflow mode, so the copy above it must
-    // not ask for credentials the page never collects.
+    it('has no password field and no reset link', () => {
+        const text = mountLogin().text();
+
+        expect(text).not.toContain('Wachtwoord');
+    });
+
+    it('keeps the passkey button, in Dutch', () => {
+        const wrapper = mountLogin();
+        const passkey = wrapper.findComponent({ name: 'PasskeyVerify' });
+
+        expect(passkey.exists()).toBe(true);
+        expect(passkey.attributes('label')).toBe('Inloggen met een passkey');
+        expect(passkey.attributes('separator')).toBe('Of ga verder met e-mail');
+    });
+
+    it('asks for the six digit code once one was sent', () => {
+        const wrapper = mountLogin('robbin@example.com');
+        const code = wrapper.get('input[name="code"]');
+
+        expect(wrapper.get('form').attributes('data-action')).toBe('/login');
+        expect(code.attributes('inputmode')).toBe('numeric');
+        expect(code.attributes('autocomplete')).toBe('one-time-code');
+        expect(code.attributes('maxlength')).toBe('6');
+        expect(wrapper.text()).toContain('robbin@example.com');
+        expect(wrapper.text()).toContain('Onthoud mij');
+        expect(layoutProps()).toMatchObject({
+            description: 'Vul de code in die we naar je gemaild hebben',
+        });
+    });
+
+    it('sends the address along with the code', () => {
+        const wrapper = mountLogin('robbin@example.com');
+
+        expect(wrapper.get('input[name="email"]').attributes('type')).toBe(
+            'hidden',
+        );
+        expect(wrapper.get('input[name="email"]').element).toHaveProperty(
+            'value',
+            'robbin@example.com',
+        );
+    });
+
+    it('keeps only digits and at most six of them', async () => {
+        const wrapper = mountLogin('robbin@example.com');
+        const code = wrapper.get('input[name="code"]');
+
+        await code.setValue('12 34-5a678');
+
+        expect((code.element as HTMLInputElement).value).toBe('123456');
+    });
+
+    it('offers a new code and a way back to another address', async () => {
+        const wrapper = mountLogin('robbin@example.com');
+
+        expect(wrapper.text()).toContain('Stuur een nieuwe code');
+
+        await wrapper.get('[data-test="change-email"]').trigger('click');
+
+        expect(wrapper.find('input[name="code"]').exists()).toBe(false);
+        expect(wrapper.find('input[name="email"]').attributes('type')).toBe(
+            'email',
+        );
+    });
+
     it('points to the Thijssensoftware account in workflow mode', () => {
         state.workflowEnabled = true;
 
@@ -69,7 +141,6 @@ describe('Login', () => {
         expect(wrapper.find('input[name="email"]').exists()).toBe(false);
         expect(wrapper.get('a').attributes('href')).toBe('/auth/sso/redirect');
         expect(layoutProps()).toMatchObject({
-            title: 'Log in op je account',
             description: 'Log in met je Thijssensoftware-account',
         });
     });

@@ -9,9 +9,11 @@ that are specific to the template.
 
 The template runs in one of two modes, switched at runtime by `WORKFLOW_MODE` (`config/workflow.php`):
 
-- **Base mode (`WORKFLOW_MODE=false`, default):** a standalone app with the official Laravel
-  Inertia+Vue starter auth (local email + password, registration, reset, verification, passkeys,
-  2FA, settings). This is the starting point for standalone apps.
+- **Base mode (`WORKFLOW_MODE=false`, default):** in Recipes, login is a 6 digit code mailed
+  through Zero's outbound API (RECIP-7; `ZERO_URL`, `ZERO_OUTBOUND_TOKEN`) or a passkey. There is
+  no password, reset or two-factor. `user:create` makes the one user, and `user:login-link` prints
+  a one-time 15 minute link for when mail is down. Without the two env values nobody can get a
+  code, so set them before deploying.
 - **Workflow mode (`WORKFLOW_MODE=true`):** login is delegated to Thijssensoftware ID (SSO) and the
   portal switcher is shown. Added under ticket WEB-2; base mode is complete first.
 
@@ -62,8 +64,9 @@ The template runs in one of two modes, switched at runtime by `WORKFLOW_MODE` (`
   app-deploy checks after a release, so `CheckDatabaseOnHealthCheck` makes it answer 500 when the
   DB is unreachable too, and a release that cannot reach it is switched back (WEB-34).
 - **API tokens:** Sanctum personal access tokens, managed at `settings/api-tokens` (list, create
-  with a one-time reveal, revoke). The pages sit behind `RequirePassword`, since a token is a
-  full-access credential. In workflow mode users have no password, so confirming is a round
+  with a one-time reveal, revoke). In base mode there is no password to confirm with, so the pages
+  ask for nothing extra. In workflow mode they sit behind `RequirePassword`, since a token is a
+  full-access credential, and users have no password, so confirming is a round
   trip through ID that must sign the user in again after it was asked for
   (`App\Actions\Workflow\ConfirmIdentityThroughId`, WEB-28), and every local credential route
   (passkeys, two-factor, password change, the Security page) answers 404 there
