@@ -20,8 +20,8 @@ defineOptions({
 <template>
     <Head title="Nieuw recept" />
 
-    <div class="flex h-full flex-1 flex-col gap-4 p-4">
-        <h1 class="text-xl font-semibold">Nieuw recept</h1>
+    <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-4 md:p-8">
+        <h1 class="text-3xl font-semibold md:text-4xl">Nieuw recept</h1>
 
         <RecipeForm :known-tags="knownTags" />
     </div>

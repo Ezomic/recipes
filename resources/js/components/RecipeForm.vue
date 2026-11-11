@@ -109,14 +109,17 @@ function submit(): void {
 </script>
 
 <template>
-    <form class="flex max-w-xl flex-col gap-6" @submit.prevent="submit">
+    <form
+        class="flex flex-col gap-6 rounded-2xl border bg-card p-5 shadow-xs md:p-8"
+        @submit.prevent="submit"
+    >
         <div class="grid gap-2">
             <Label for="title">Titel</Label>
             <Input id="title" v-model="form.title" autofocus />
             <InputError :message="form.errors.title" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 items-end gap-4">
             <div class="grid gap-2">
                 <Label for="preparation_minutes"
                     >Bereidingstijd (minuten)</Label
@@ -192,7 +195,7 @@ function submit(): void {
             <div
                 v-for="(ingredient, position) in form.ingredients"
                 :key="position"
-                class="flex items-start gap-2"
+                class="flex flex-wrap items-start gap-2 sm:flex-nowrap"
             >
                 <Input
                     v-model="ingredient.quantity"
@@ -204,7 +207,7 @@ function submit(): void {
                 <select
                     v-model="ingredient.unit"
                     :aria-label="`Eenheid ingrediënt ${position + 1}`"
-                    class="h-9 w-32 shrink-0 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    class="h-9 min-w-0 flex-1 shrink-0 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:w-32 sm:flex-none"
                 >
                     <option value="">Geen eenheid</option>
                     <option
@@ -219,7 +222,7 @@ function submit(): void {
                     v-model="ingredient.name"
                     :aria-label="`Naam ingrediënt ${position + 1}`"
                     placeholder="Naam"
-                    class="min-w-0 flex-1"
+                    class="order-last min-w-0 basis-full sm:order-none sm:flex-1 sm:basis-0"
                 />
                 <Button
                     type="button"
