@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ChefHat } from '@lucide/vue';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
 
 defineProps<{
@@ -25,7 +25,10 @@ defineProps<{
                         <div
                             class="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground"
                         >
-                            <ChefHat class="size-8" aria-hidden="true" />
+                            <AppLogoIcon
+                                class="size-8 fill-current"
+                                aria-hidden="true"
+                            />
                         </div>
                         <span class="sr-only">{{ title }}</span>
                     </Link>
