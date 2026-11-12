@@ -139,6 +139,31 @@ describe('recipes/Show', () => {
         expect(wrapper.find('img').attributes('loading')).toBe('lazy');
     });
 
+    it('steps the wanted servings with the plus and minus buttons', async () => {
+        const wrapper = mount(Show, { props: { recipe } });
+        const input = wrapper.find('#wanted-servings');
+
+        await wrapper.find('[aria-label="Meer porties"]').trigger('click');
+        expect((input.element as HTMLInputElement).value).toBe('5');
+        expect(items(wrapper)[0]).toBe('313 g Bloem');
+
+        await wrapper.find('[aria-label="Minder porties"]').trigger('click');
+        await wrapper.find('[aria-label="Minder porties"]').trigger('click');
+        expect((input.element as HTMLInputElement).value).toBe('3');
+    });
+
+    it('does not step below one serving', async () => {
+        const wrapper = mount(Show, {
+            props: { recipe: { ...recipe, servings: 1 } },
+        });
+
+        expect(
+            wrapper
+                .find('[aria-label="Minder porties"]')
+                .attributes('disabled'),
+        ).toBeDefined();
+    });
+
     it('shows no image for a recipe without a photo', () => {
         expect(mount(Show, { props: { recipe } }).find('img').exists()).toBe(
             false,
