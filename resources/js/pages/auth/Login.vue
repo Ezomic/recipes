@@ -55,6 +55,14 @@ watch(code, (value) => {
         code.value = digits;
     }
 });
+
+const shownByField = ['code', 'email'];
+
+function remainingErrors(errors: Record<string, string>): string[] {
+    return Object.entries(errors)
+        .filter(([field]) => !shownByField.includes(field))
+        .map(([, message]) => message);
+}
 </script>
 
 <template>
@@ -111,6 +119,12 @@ watch(code, (value) => {
                     <Checkbox id="remember" name="remember" />
                     <span>Onthoud mij</span>
                 </Label>
+
+                <InputError
+                    v-for="message in remainingErrors(errors)"
+                    :key="message"
+                    :message="message"
+                />
 
                 <Button
                     type="submit"

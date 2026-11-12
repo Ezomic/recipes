@@ -5,13 +5,15 @@ import Login from '@/pages/auth/Login.vue';
 const state = vi.hoisted(() => ({
     workflowEnabled: false,
     setLayoutProps: vi.fn(),
+    errors: {} as Record<string, string>,
 }));
 
 vi.mock('@inertiajs/vue3', () => ({
     Form: {
         props: ['action', 'method'],
+        setup: () => ({ state }),
         template:
-            '<form :data-action="action"><slot :errors="{}" :processing="false" /></form>',
+            '<form :data-action="action"><slot :errors="state.errors" :processing="false" /></form>',
     },
     Head: { template: '<span />' },
     Link: { props: ['href'], template: '<a :href="href"><slot /></a>' },
@@ -51,6 +53,43 @@ describe('Login', () => {
     beforeEach(() => {
         state.workflowEnabled = false;
         state.setLayoutProps.mockClear();
+        state.errors = {};
+    });
+
+    it('submits the remember checkbox under the name the server reads', async () => {
+        const wrapper = mountLogin('robbin@example.com');
+        const form = wrapper.get('form').element as HTMLFormElement;
+
+        expect(new FormData(form).has('remember')).toBe(false);
+
+        await wrapper.get('#remember').trigger('click');
+
+        expect(new FormData(form).get('remember')).toBe('on');
+    });
+
+    it('shows an error for a field that has no place of its own', () => {
+        state.errors = {
+            code: 'Deze code is onjuist of verlopen.',
+            remember: 'Ongeldige keuze.',
+        };
+
+        const wrapper = mountLogin('robbin@example.com');
+        const shown = wrapper
+            .findAll('p')
+            .map((paragraph) => paragraph.text())
+            .filter((text) => text === 'Ongeldige keuze.');
+
+        expect(shown).toHaveLength(1);
+        expect(wrapper.text()).toContain('Deze code is onjuist of verlopen.');
+        expect(
+            wrapper
+                .findAll('p')
+                .filter(
+                    (paragraph) =>
+                        paragraph.text() ===
+                        'Deze code is onjuist of verlopen.',
+                ),
+        ).toHaveLength(1);
     });
 
     it('first asks only for the email address', () => {
