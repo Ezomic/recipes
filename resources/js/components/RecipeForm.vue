@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
-import { Plus, Trash2 } from '@lucide/vue';
+import { ChevronDown, ChevronUp, Plus, Trash2 } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import RecipePhoto from '@/components/RecipePhoto.vue';
@@ -82,6 +82,11 @@ function addIngredient(): void {
 
 function removeIngredient(position: number): void {
     form.ingredients.splice(position, 1);
+}
+
+function moveIngredient(position: number, offset: -1 | 1): void {
+    const [moved] = form.ingredients.splice(position, 1);
+    form.ingredients.splice(position + offset, 0, moved);
 }
 
 function choosePhoto(event: Event): void {
@@ -216,6 +221,26 @@ function submit(): void {
                     placeholder="Naam"
                     class="min-w-0 flex-1"
                 />
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    :aria-label="`Ingrediënt ${position + 1} omhoog verplaatsen`"
+                    :disabled="position === 0"
+                    @click="moveIngredient(position, -1)"
+                >
+                    <ChevronUp class="size-4" />
+                </Button>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    :aria-label="`Ingrediënt ${position + 1} omlaag verplaatsen`"
+                    :disabled="position === form.ingredients.length - 1"
+                    @click="moveIngredient(position, 1)"
+                >
+                    <ChevronDown class="size-4" />
+                </Button>
                 <Button
                     type="button"
                     variant="ghost"

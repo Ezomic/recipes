@@ -135,6 +135,63 @@ describe('RecipeForm', () => {
         expect(names.map((input) => input.element.value)).toEqual(['Zout', '']);
     });
 
+    it('moves an ingredient row up and down, taking its quantity and unit along', async () => {
+        const wrapper = mount(RecipeForm, { props: { recipe } });
+        const names = () =>
+            wrapper
+                .findAll<HTMLInputElement>('[aria-label^="Naam ingrediënt"]')
+                .map((input) => input.element.value);
+
+        await wrapper
+            .find('[aria-label="Ingrediënt 2 omhoog verplaatsen"]')
+            .trigger('click');
+        expect(names()).toEqual(['Zout', 'Bloem']);
+        expect(
+            wrapper.findAll('select').map((select) => select.element.value),
+        ).toEqual(['', 'g']);
+        expect(
+            wrapper
+                .findAll<HTMLInputElement>(
+                    '[aria-label^="Hoeveelheid ingrediënt"]',
+                )
+                .map((input) => input.element.value),
+        ).toEqual(['', '250,5']);
+
+        await wrapper
+            .find('[aria-label="Ingrediënt 1 omlaag verplaatsen"]')
+            .trigger('click');
+        expect(names()).toEqual(['Bloem', 'Zout']);
+    });
+
+    it('disables moving the first row up and the last row down', () => {
+        const wrapper = mount(RecipeForm, { props: { recipe } });
+
+        const disabled = (label: string) =>
+            wrapper.find(`[aria-label="${label}"]`).attributes('disabled');
+        expect(disabled('Ingrediënt 1 omhoog verplaatsen')).toBeDefined();
+        expect(disabled('Ingrediënt 1 omlaag verplaatsen')).toBeUndefined();
+        expect(disabled('Ingrediënt 2 omhoog verplaatsen')).toBeUndefined();
+        expect(disabled('Ingrediënt 2 omlaag verplaatsen')).toBeDefined();
+    });
+
+    it('sends the reordered ingredients in the new order on submit', async () => {
+        const wrapper = mount(RecipeForm, { props: { recipe } });
+        const visit = vi.spyOn(router, 'visit').mockImplementation(() => {});
+        await wrapper
+            .find('[aria-label="Ingrediënt 1 omlaag verplaatsen"]')
+            .trigger('click');
+        await wrapper.find('form').trigger('submit');
+
+        const data = visit.mock.calls[0][1]?.data as {
+            ingredients: { name: string }[];
+        };
+        expect(data.ingredients.map((row) => row.name)).toEqual([
+            'Zout',
+            'Bloem',
+        ]);
+        visit.mockRestore();
+    });
+
     it('offers every unit plus a choice for none', () => {
         const wrapper = mount(RecipeForm);
 
