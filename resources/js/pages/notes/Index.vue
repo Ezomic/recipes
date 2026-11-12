@@ -12,7 +12,7 @@ defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Notes', href: index() }],
+        breadcrumbs: [{ title: 'Notities', href: index() }],
     },
 });
 
@@ -22,15 +22,15 @@ function remove(note: Note): void {
 </script>
 
 <template>
-    <Head title="Notes" />
+    <Head title="Notities" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
         <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold">Notes</h1>
+            <h1 class="text-xl font-semibold">Notities</h1>
             <Button as-child size="sm">
                 <Link :href="create()">
                     <Plus class="size-4" />
-                    New note
+                    Nieuwe notitie
                 </Link>
             </Button>
         </div>
@@ -39,7 +39,7 @@ function remove(note: Note): void {
             v-if="notes.data.length === 0"
             class="rounded-xl border border-dashed border-sidebar-border/70 p-8 text-center text-sm text-muted-foreground"
         >
-            No notes yet. Create your first one.
+            Nog geen notities. Maak je eerste aan.
         </p>
 
         <ul v-else class="flex flex-col gap-2">
@@ -56,14 +56,17 @@ function remove(note: Note): void {
                 </div>
                 <div class="flex shrink-0 items-center gap-1">
                     <Button as-child variant="ghost" size="icon">
-                        <Link :href="edit(note.id)" aria-label="Edit note">
+                        <Link
+                            :href="edit(note.id)"
+                            aria-label="Notitie bewerken"
+                        >
                             <Pencil class="size-4" />
                         </Link>
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        aria-label="Delete note"
+                        aria-label="Notitie verwijderen"
                         @click="remove(note)"
                     >
                         <Trash2 class="size-4" />

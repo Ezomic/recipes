@@ -168,7 +168,7 @@ watch(code, (value) => {
                     required
                     autofocus
                     autocomplete="email"
-                    placeholder="email@example.com"
+                    placeholder="naam@voorbeeld.nl"
                 />
                 <InputError :message="errors.email" />
             </div>

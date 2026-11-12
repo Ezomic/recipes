@@ -17,29 +17,28 @@ type ErrorCopy = {
 
 const copy: Record<number, ErrorCopy> = {
     403: {
-        title: 'Forbidden',
-        description: 'You do not have permission to view this page.',
+        title: 'Geen toegang',
+        description: 'Je hebt geen toestemming om deze pagina te bekijken.',
     },
     404: {
-        title: 'Page not found',
-        description:
-            'This page does not exist, or it has moved somewhere else.',
+        title: 'Pagina niet gevonden',
+        description: 'Deze pagina bestaat niet of is verplaatst.',
     },
     419: {
-        title: 'Page expired',
+        title: 'Pagina verlopen',
         description:
-            'Your session timed out for security. Reload the page and try again.',
+            'Je sessie is om veiligheidsredenen verlopen. Laad de pagina opnieuw en probeer het nog eens.',
     },
     500: {
-        title: 'Something went wrong',
+        title: 'Er ging iets mis',
         description:
-            'An unexpected error occurred on our side. It has been logged and we are looking into it.',
+            'Er is een onverwachte fout opgetreden. Die is vastgelegd en we kijken ernaar.',
     },
 };
 
 const fallback: ErrorCopy = {
-    title: 'Something went wrong',
-    description: 'The server could not complete that request.',
+    title: 'Er ging iets mis',
+    description: 'De server kon dit verzoek niet afronden.',
 };
 
 const current = computed<ErrorCopy>(() => copy[props.status] ?? fallback);
@@ -83,7 +82,7 @@ function reload(): void {
 
                 <div class="flex flex-col gap-3">
                     <Button v-if="status === 419" @click="reload">
-                        Reload the page
+                        Pagina opnieuw laden
                     </Button>
                     <Button
                         :variant="status === 419 ? 'outline' : 'default'"
@@ -95,7 +94,7 @@ function reload(): void {
                             {{
                                 isAuthenticated
                                     ? 'Terug naar recepten'
-                                    : 'Go to login'
+                                    : 'Naar inloggen'
                             }}
                         </Link>
                     </Button>

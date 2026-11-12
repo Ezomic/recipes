@@ -10,8 +10,8 @@ import { create, index, store } from '@/routes/notes';
 defineOptions({
     layout: {
         breadcrumbs: [
-            { title: 'Notes', href: index() },
-            { title: 'New', href: create() },
+            { title: 'Notities', href: index() },
+            { title: 'Nieuw', href: create() },
         ],
     },
 });
@@ -24,20 +24,20 @@ function submit(): void {
 </script>
 
 <template>
-    <Head title="New note" />
+    <Head title="Nieuwe notitie" />
 
     <div class="flex h-full flex-1 flex-col gap-4 p-4">
-        <h1 class="text-xl font-semibold">New note</h1>
+        <h1 class="text-xl font-semibold">Nieuwe notitie</h1>
 
         <form class="flex max-w-xl flex-col gap-6" @submit.prevent="submit">
             <div class="grid gap-2">
-                <Label for="title">Title</Label>
+                <Label for="title">Titel</Label>
                 <Input id="title" v-model="form.title" autofocus />
                 <InputError :message="form.errors.title" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="body">Body</Label>
+                <Label for="body">Inhoud</Label>
                 <textarea
                     id="body"
                     v-model="form.body"
@@ -50,10 +50,10 @@ function submit(): void {
             <div class="flex items-center gap-2">
                 <Button type="submit" :disabled="form.processing">
                     <Spinner v-if="form.processing" />
-                    Create note
+                    Notitie aanmaken
                 </Button>
                 <Button as-child type="button" variant="ghost">
-                    <Link :href="index()">Cancel</Link>
+                    <Link :href="index()">Annuleren</Link>
                 </Button>
             </div>
         </form>

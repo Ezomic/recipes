@@ -28,12 +28,12 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/Ezomic/web-template',
+        href: 'https://github.com/Ezomic/recipes',
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
-        href: 'https://github.com/Ezomic/web-template/blob/main/web/CLAUDE.md',
+        title: 'Documentatie',
+        href: 'https://github.com/Ezomic/recipes/blob/main/web/CLAUDE.md',
         icon: BookOpen,
     },
 ];

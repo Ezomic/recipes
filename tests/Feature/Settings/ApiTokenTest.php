@@ -207,10 +207,10 @@ it('shows when each token expires, and that it has', function () {
     $this->get('/settings/api-tokens')
         ->assertInertia(fn (Assert $page) => $page
             ->where('tokens.0.name', 'New')
-            ->where('tokens.0.expires_at_diff', '4 weeks from now')
+            ->where('tokens.0.expires_at_diff', 'over 4 weken')
             ->where('tokens.0.expired', false)
             ->where('tokens.1.name', 'Old')
-            ->where('tokens.1.expires_at_diff', '1 day ago')
+            ->where('tokens.1.expires_at_diff', '1 dag geleden')
             ->where('tokens.1.expired', true));
 });
 

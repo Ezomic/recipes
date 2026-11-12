@@ -30,7 +30,7 @@ it('refuses a second user, since the app has exactly one login', function () {
     User::factory()->create();
 
     $this->artisan('user:create', ['name' => 'Second', 'email' => 'second@example.com'])
-        ->expectsOutputToContain('already')
+        ->expectsOutputToContain('bestaat al')
         ->assertFailed();
 
     expect(User::query()->count())->toBe(1);
