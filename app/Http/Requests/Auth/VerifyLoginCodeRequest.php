@@ -20,7 +20,6 @@ final class VerifyLoginCodeRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'max:254', 'regex:/\A[^\x00-\x1F\x7F]+\z/', 'email'],
             'code' => ['required', 'string', 'regex:/\A[0-9]{6}\z/'],
-            'remember' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -32,7 +31,6 @@ final class VerifyLoginCodeRequest extends FormRequest
         return [
             'email.*' => 'Vul een geldig e-mailadres in.',
             'code.*' => 'Voer de 6 cijfers van je code in.',
-            'remember.*' => 'Ongeldige keuze.',
         ];
     }
 

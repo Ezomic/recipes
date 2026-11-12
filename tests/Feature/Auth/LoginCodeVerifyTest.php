@@ -84,6 +84,37 @@ it('sets a remember cookie only when asked to', function () {
     expect($remembered->getCookie(Auth::guard()->getRecallerName()))->not->toBeNull();
 });
 
+it('logs in and remembers when the ticked checkbox posts its value', function (mixed $ticked) {
+    $code = issueCode();
+
+    $response = verifyCode($code, extra: ['remember' => $ticked])
+        ->assertRedirect(route('recipes.index'))
+        ->assertSessionHasNoErrors();
+
+    $this->assertAuthenticatedAs($this->user);
+    expect($response->getCookie(Auth::guard()->getRecallerName()))->not->toBeNull();
+})->with([
+    'browser default' => ['on'],
+    'one' => ['1'],
+    'true' => [true],
+]);
+
+it('logs in without remembering when the checkbox is left alone', function (array $extra) {
+    $code = issueCode();
+
+    $response = verifyCode($code, extra: $extra)
+        ->assertRedirect(route('recipes.index'))
+        ->assertSessionHasNoErrors();
+
+    $this->assertAuthenticatedAs($this->user);
+    expect($response->getCookie(Auth::guard()->getRecallerName()))->toBeNull();
+})->with([
+    'absent' => [[]],
+    'zero' => [['remember' => '0']],
+    'false' => [['remember' => false]],
+    'empty' => [['remember' => '']],
+]);
+
 it('accepts codes with leading zeros', function () {
     $this->user->loginCode()->create([
         'code_hash' => hash_hmac('sha256', $this->user->id.'|001234', (string) config('app.key')),
