@@ -33,6 +33,7 @@ trait RecipeValidationRules
             'ingredients.*.name' => ['nullable', 'required_with:ingredients.*.quantity,ingredients.*.unit', 'string', 'max:255'],
             'tags' => ['nullable', 'array', 'max:20'],
             'tags.*' => ['string', 'max:'.Tag::MAX_LENGTH],
+            'country' => ['nullable', 'string', 'max:60'],
             'photo' => ['nullable', 'bail', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png,image/webp', 'dimensions:max_width=4000,max_height=4000'],
             'remove_photo' => ['nullable', 'boolean'],
         ];
@@ -49,10 +50,12 @@ trait RecipeValidationRules
     {
         $ingredients = $this->input('ingredients');
         $tags = $this->input('tags');
+        $country = $this->input('country');
 
         $this->merge([
             ...(is_array($ingredients) ? ['ingredients' => array_map($this->normaliseIngredient(...), $ingredients)] : []),
             ...(is_array($tags) ? ['tags' => $this->normaliseTags($tags)] : []),
+            ...(is_string($country) ? ['country' => Str::trim($country) === '' ? null : Str::trim($country)] : []),
         ]);
     }
 
@@ -135,6 +138,8 @@ trait RecipeValidationRules
             'tags.max' => 'Een recept mag maximaal 20 tags hebben.',
             'tags.*.string' => 'Een tag moet tekst zijn.',
             'tags.*.max' => 'Een tag mag maximaal 50 tekens lang zijn.',
+            'country.string' => 'Het land moet tekst zijn.',
+            'country.max' => 'Het land mag maximaal 60 tekens lang zijn.',
             'photo.file' => 'Kies een afbeelding om te uploaden.',
             'photo.uploaded' => 'Het uploaden van de foto is mislukt.',
             'photo.max' => 'De foto mag maximaal 5 MB groot zijn.',

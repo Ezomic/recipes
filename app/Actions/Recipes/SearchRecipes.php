@@ -34,6 +34,10 @@ final class SearchRecipes
             $query->whereHas('tags', fn (Builder $tag) => $tag->whereIn('tags.name', $filters->tags), '=', count($filters->tags));
         }
 
+        if ($filters->country !== null) {
+            $query->where('country', $filters->country);
+        }
+
         if ($filters->maxMinutes !== null) {
             $query->where('preparation_minutes', '<=', $filters->maxMinutes);
         }

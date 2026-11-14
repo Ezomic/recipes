@@ -16,6 +16,7 @@ const props = defineProps<{
     recipes: Paginated<Recipe>;
     filters: RecipeFilters;
     knownTags: string[];
+    knownCountries: string[];
 }>();
 
 defineOptions({
@@ -29,6 +30,7 @@ const TYPING_PAUSE = 300;
 type Query = {
     q?: string;
     tag?: string[];
+    country?: string;
     max_minutes?: number;
     houdbaar?: 1;
 };
@@ -36,6 +38,7 @@ type Query = {
 type Changes = {
     q?: string;
     tag?: string[];
+    country?: string;
     max_minutes?: string;
     houdbaar?: boolean;
 };
@@ -68,6 +71,7 @@ onBeforeUnmount(() => {
 function visit(changes: Changes): void {
     const q = (changes.q ?? search.value).trim();
     const tag = changes.tag ?? props.filters.tag;
+    const country = changes.country ?? props.filters.country ?? '';
     const minutes = Number(changes.max_minutes ?? maxMinutes.value);
     const query: Query = {};
 
@@ -77,6 +81,10 @@ function visit(changes: Changes): void {
 
     if (tag.length > 0) {
         query.tag = tag;
+    }
+
+    if (country !== '') {
+        query.country = country;
     }
 
     if (Number.isInteger(minutes) && minutes >= 1) {
@@ -157,7 +165,35 @@ function toggleTag(name: string): void {
                     </div>
                 </div>
 
-                <div class="flex items-end gap-4">
+                <div class="flex flex-wrap items-end gap-4">
+                    <div
+                        v-if="knownCountries.length > 0"
+                        class="grid gap-2 sm:w-44"
+                    >
+                        <Label for="filter-country">Land</Label>
+                        <select
+                            id="filter-country"
+                            :value="filters.country ?? ''"
+                            class="h-10 min-w-0 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            @change="
+                                visit({
+                                    country: (
+                                        $event.target as HTMLSelectElement
+                                    ).value,
+                                })
+                            "
+                        >
+                            <option value="">Alle landen</option>
+                            <option
+                                v-for="country in knownCountries"
+                                :key="country"
+                                :value="country"
+                            >
+                                {{ country }}
+                            </option>
+                        </select>
+                    </div>
+
                     <div class="grid flex-1 gap-2 sm:w-44 sm:flex-none">
                         <Label for="max-minutes">Maximaal (minuten)</Label>
                         <Input
@@ -245,6 +281,9 @@ function toggleTag(name: string): void {
                         <p class="text-sm text-muted-foreground">
                             {{ recipe.preparation_minutes }} min ·
                             {{ recipe.servings }} porties
+                            <template v-if="recipe.country">
+                                · {{ recipe.country }}
+                            </template>
                         </p>
                         <div
                             v-if="recipe.tags.length > 0"

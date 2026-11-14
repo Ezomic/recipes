@@ -27,6 +27,7 @@ class RecipeFactory extends Factory
             'preparation_minutes' => fake()->numberBetween(5, 120),
             'servings' => fake()->numberBetween(1, 8),
             'houdbaar' => fake()->boolean(),
+            'country' => null,
             'photo_path' => null,
         ];
     }

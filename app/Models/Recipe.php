@@ -24,12 +24,13 @@ use Illuminate\Support\Carbon;
  * @property int $preparation_minutes
  * @property int $servings
  * @property bool $houdbaar
+ * @property string|null $country
  * @property string|null $photo_path
  * @property-read string|null $photo_version
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['title', 'steps', 'preparation_minutes', 'servings', 'houdbaar'])]
+#[Fillable(['title', 'steps', 'preparation_minutes', 'servings', 'houdbaar', 'country'])]
 #[Hidden(['user_id', 'photo_path'])]
 #[Appends(['photo_version'])]
 class Recipe extends Model
