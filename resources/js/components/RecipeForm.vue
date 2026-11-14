@@ -17,6 +17,7 @@ import type { RecipeWithIngredients } from '@/types';
 const props = defineProps<{
     recipe?: RecipeWithIngredients;
     knownTags?: string[];
+    knownCountries?: string[];
 }>();
 
 function blankIngredient(): { quantity: string; unit: string; name: string } {
@@ -29,6 +30,7 @@ const form = useForm({
     preparation_minutes: String(props.recipe?.preparation_minutes ?? ''),
     servings: String(props.recipe?.servings ?? ''),
     houdbaar: props.recipe?.houdbaar ?? false,
+    country: props.recipe?.country ?? '',
     photo: null as File | null,
     remove_photo: false,
     tags: props.recipe?.tags.map((tag) => tag.name) ?? [],
@@ -148,6 +150,26 @@ function submit(): void {
             <Label for="houdbaar">Houdbaar (bewaren zonder koelkast)</Label>
         </div>
         <InputError :message="form.errors.houdbaar" />
+
+        <div class="grid gap-2">
+            <Label for="country">Land</Label>
+            <Input
+                id="country"
+                v-model="form.country"
+                list="known-countries"
+                maxlength="60"
+                autocomplete="off"
+                placeholder="Bijvoorbeeld Frankrijk"
+            />
+            <datalist id="known-countries">
+                <option
+                    v-for="country in knownCountries"
+                    :key="country"
+                    :value="country"
+                />
+            </datalist>
+            <InputError :message="form.errors.country" />
+        </div>
 
         <div class="grid gap-2">
             <Label for="photo">{{

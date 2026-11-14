@@ -24,6 +24,7 @@ const recipe: RecipeWithIngredients = {
     preparation_minutes: 45,
     servings: 4,
     houdbaar: false,
+    country: 'Frankrijk',
     photo_version: null,
     created_at: '',
     updated_at: '',
@@ -54,6 +55,24 @@ async function setServings(wrapper: ReturnType<typeof mount>, value: string) {
 }
 
 describe('recipes/Show', () => {
+    it('shows the country when the recipe has one', () => {
+        const wrapper = mount(Show, { props: { recipe } });
+
+        expect(wrapper.find('[data-testid="recipe-country"]').text()).toBe(
+            'Frankrijk',
+        );
+    });
+
+    it('shows no country badge without one', () => {
+        const wrapper = mount(Show, {
+            props: { recipe: { ...recipe, country: null } },
+        });
+
+        expect(wrapper.find('[data-testid="recipe-country"]').exists()).toBe(
+            false,
+        );
+    });
+
     it('lists the ingredients as stored at the recipe servings', () => {
         const wrapper = mount(Show, { props: { recipe } });
 

@@ -22,6 +22,7 @@ final class IndexRecipesRequest extends FormRequest
             'q' => ['nullable', 'string', 'max:100'],
             'tag' => ['nullable', 'array', 'max:10'],
             'tag.*' => ['nullable', 'string', 'max:'.Tag::MAX_LENGTH],
+            'country' => ['nullable', 'string', 'max:60'],
             'max_minutes' => ['nullable', 'integer', 'min:1', 'max:10080'],
             'houdbaar' => ['nullable', 'boolean'],
             'page' => ['nullable', 'integer', 'min:1', 'max:100000'],
@@ -43,6 +44,7 @@ final class IndexRecipesRequest extends FormRequest
         $valid = $validator->valid();
         $search = $valid['q'] ?? null;
         $tags = $valid['tag'] ?? [];
+        $country = $valid['country'] ?? null;
         $maxMinutes = $valid['max_minutes'] ?? null;
         $page = $valid['page'] ?? null;
 
@@ -51,6 +53,7 @@ final class IndexRecipesRequest extends FormRequest
             tags: is_array($tags) ? $tags : [],
             maxMinutes: is_numeric($maxMinutes) ? (int) $maxMinutes : null,
             houdbaar: filter_var($valid['houdbaar'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            country: is_string($country) ? $country : null,
             page: is_numeric($page) ? (int) $page : 1,
         );
     }

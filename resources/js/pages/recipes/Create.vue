@@ -5,6 +5,7 @@ import { create, index } from '@/routes/recipes';
 
 defineProps<{
     knownTags: string[];
+    knownCountries: string[];
 }>();
 
 defineOptions({
@@ -23,6 +24,6 @@ defineOptions({
     <div class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 p-4 md:p-8">
         <h1 class="text-3xl font-semibold md:text-4xl">Nieuw recept</h1>
 
-        <RecipeForm :known-tags="knownTags" />
+        <RecipeForm :known-tags="knownTags" :known-countries="knownCountries" />
     </div>
 </template>
