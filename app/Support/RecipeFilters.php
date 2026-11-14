@@ -11,6 +11,8 @@ final readonly class RecipeFilters
 {
     public ?string $search;
 
+    public ?string $country;
+
     /** @var list<string> */
     public array $tags;
 
@@ -22,10 +24,14 @@ final readonly class RecipeFilters
         array $tags,
         public ?int $maxMinutes,
         public bool $houdbaar,
+        ?string $country = null,
         public int $page = 1,
     ) {
         $search = $search === null ? '' : Str::trim($search);
         $this->search = $search === '' ? null : $search;
+
+        $country = $country === null ? '' : Str::trim($country);
+        $this->country = $country === '' ? null : $country;
 
         $names = [];
 
@@ -42,11 +48,11 @@ final readonly class RecipeFilters
 
     public function isActive(): bool
     {
-        return $this->search !== null || $this->tags !== [] || $this->maxMinutes !== null || $this->houdbaar;
+        return $this->search !== null || $this->tags !== [] || $this->country !== null || $this->maxMinutes !== null || $this->houdbaar;
     }
 
     /**
-     * @return array{q: string|null, tag: list<string>, max_minutes: int|null, houdbaar: bool, active: bool}
+     * @return array{q: string|null, tag: list<string>, max_minutes: int|null, houdbaar: bool, country: string|null, active: bool}
      */
     public function toArray(): array
     {
@@ -55,6 +61,7 @@ final readonly class RecipeFilters
             'tag' => $this->tags,
             'max_minutes' => $this->maxMinutes,
             'houdbaar' => $this->houdbaar,
+            'country' => $this->country,
             'active' => $this->isActive(),
         ];
     }

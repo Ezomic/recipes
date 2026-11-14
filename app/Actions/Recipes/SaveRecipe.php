@@ -35,6 +35,7 @@ final class SaveRecipe
         bool $houdbaar,
         array $ingredients,
         array $tags = [],
+        ?string $country = null,
         ?Recipe $recipe = null,
         ?UploadedFile $photo = null,
         bool $removePhoto = false,
@@ -43,7 +44,7 @@ final class SaveRecipe
         $oldPhoto = null;
 
         try {
-            $saved = DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $tags, $recipe, $newPhoto, $removePhoto, &$oldPhoto): Recipe {
+            $saved = DB::transaction(function () use ($user, $title, $steps, $preparationMinutes, $servings, $houdbaar, $ingredients, $tags, $country, $recipe, $newPhoto, $removePhoto, &$oldPhoto): Recipe {
                 $recipe ??= $user->recipes()->make();
 
                 if ($recipe->exists) {
@@ -56,6 +57,7 @@ final class SaveRecipe
                     'preparation_minutes' => $preparationMinutes,
                     'servings' => $servings,
                     'houdbaar' => $houdbaar,
+                    'country' => $this->cleanCountry($country),
                     ...($newPhoto !== null || $removePhoto ? ['photo_path' => $newPhoto] : []),
                 ])->save();
 
@@ -80,6 +82,13 @@ final class SaveRecipe
         }
 
         return $saved;
+    }
+
+    private function cleanCountry(?string $country): ?string
+    {
+        $country = $country === null ? '' : Str::trim($country);
+
+        return $country === '' ? null : $country;
     }
 
     /**

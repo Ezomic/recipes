@@ -26,6 +26,7 @@ const soup: Recipe = {
     preparation_minutes: 20,
     servings: 4,
     houdbaar: true,
+    country: 'Frankrijk',
     photo_version: null,
     created_at: '',
     updated_at: '',
@@ -40,6 +41,7 @@ const noFilters: RecipeFilters = {
     tag: [],
     max_minutes: null,
     houdbaar: false,
+    country: null,
     active: false,
 };
 
@@ -65,12 +67,14 @@ function render(
     data: Recipe[] = [soup],
     filters: Partial<RecipeFilters> = {},
     knownTags: string[] = ['brood', 'eenpans', 'kamperen'],
+    knownCountries: string[] = ['Frankrijk', 'Italië'],
 ) {
     return mount(Index, {
         props: {
             recipes: page(data),
             filters: { ...noFilters, ...filters },
             knownTags,
+            knownCountries,
         },
     });
 }
@@ -96,6 +100,50 @@ describe('recipes/Index', () => {
             'kamperen',
             'eenpans',
         ]);
+    });
+
+    it('shows the country on the card', () => {
+        expect(render().text()).toContain('· Frankrijk');
+    });
+
+    it('offers every known country and an option for all of them', () => {
+        const options = render()
+            .findAll('#filter-country option')
+            .map((option) => option.text());
+
+        expect(options).toEqual(['Alle landen', 'Frankrijk', 'Italië']);
+    });
+
+    it('hides the country filter when no recipe has a country', () => {
+        expect(
+            render([soup], {}, [], []).find('#filter-country').exists(),
+        ).toBe(false);
+    });
+
+    it('selects the applied country', () => {
+        const wrapper = render([soup], { country: 'Italië', active: true });
+
+        expect(
+            wrapper.find<HTMLSelectElement>('#filter-country').element.value,
+        ).toBe('Italië');
+    });
+
+    it('filters on a chosen country and clears it again', async () => {
+        const wrapper = render();
+
+        await wrapper.find('#filter-country').setValue('Frankrijk');
+        expect(getMock).toHaveBeenLastCalledWith(
+            '/recepten',
+            { country: 'Frankrijk' },
+            expect.anything(),
+        );
+
+        await wrapper.find('#filter-country').setValue('');
+        expect(getMock).toHaveBeenLastCalledWith(
+            '/recepten',
+            {},
+            expect.anything(),
+        );
     });
 
     it('shows the plain empty state when there are no recipes and no filters', () => {

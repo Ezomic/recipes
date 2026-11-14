@@ -35,12 +35,18 @@ final class RecipeController extends Controller
             'recipes' => $recipes,
             'filters' => $filters->toArray(),
             'knownTags' => $this->knownTags($user),
+            'knownCountries' => $this->knownCountries($user),
         ]);
     }
 
     public function create(Request $request): Response
     {
-        return Inertia::render('recipes/Create', ['knownTags' => $this->knownTags($this->user($request))]);
+        $user = $this->user($request);
+
+        return Inertia::render('recipes/Create', [
+            'knownTags' => $this->knownTags($user),
+            'knownCountries' => $this->knownCountries($user),
+        ]);
     }
 
     public function store(StoreRecipeRequest $request, SaveRecipe $action): RedirectResponse
@@ -54,6 +60,7 @@ final class RecipeController extends Controller
             houdbaar: $request->boolean('houdbaar'),
             ingredients: $request->array('ingredients'),
             tags: $request->array('tags'),
+            country: $request->filled('country') ? $request->string('country')->toString() : null,
             photo: $request->photo(),
             removePhoto: $request->boolean('remove_photo'),
         );
@@ -72,9 +79,12 @@ final class RecipeController extends Controller
     {
         $this->authorize('update', $recipe);
 
+        $user = $this->user($request);
+
         return Inertia::render('recipes/Edit', [
             'recipe' => $recipe->load('ingredients', 'tags'),
-            'knownTags' => $this->knownTags($this->user($request)),
+            'knownTags' => $this->knownTags($user),
+            'knownCountries' => $this->knownCountries($user),
         ]);
     }
 
@@ -89,6 +99,7 @@ final class RecipeController extends Controller
             houdbaar: $request->boolean('houdbaar'),
             ingredients: $request->array('ingredients'),
             tags: $request->array('tags'),
+            country: $request->filled('country') ? $request->string('country')->toString() : null,
             recipe: $recipe,
             photo: $request->photo(),
             removePhoto: $request->boolean('remove_photo'),
@@ -114,6 +125,14 @@ final class RecipeController extends Controller
     private function knownTags(User $user): array
     {
         return array_values($user->tags()->orderBy('name')->get()->map(fn (Tag $tag): string => $tag->name)->all());
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function knownCountries(User $user): array
+    {
+        return array_values($user->recipes()->whereNotNull('country')->distinct()->orderBy('country')->get(['country'])->map(fn (Recipe $recipe): string => (string) $recipe->country)->all());
     }
 
     private function user(Request $request): User
