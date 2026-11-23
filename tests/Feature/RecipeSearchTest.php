@@ -309,18 +309,18 @@ it('hands the page the filters it applied, the user’s tags and whether any fil
 
     $this->get('/recepten?q=soep&tag[]=Kamperen&max_minutes=30&houdbaar=1&max_minutes=30')
         ->assertInertia(fn (Assert $page) => $page
-            ->where('filters', ['q' => 'soep', 'tag' => ['kamperen'], 'max_minutes' => 30, 'houdbaar' => true, 'active' => true])
+            ->where('filters', ['q' => 'soep', 'tag' => ['kamperen'], 'max_minutes' => 30, 'houdbaar' => true, 'country' => null, 'active' => true])
             ->where('knownTags', ['kamperen']));
 
     $this->get('/recepten')
         ->assertInertia(fn (Assert $page) => $page
-            ->where('filters', ['q' => null, 'tag' => [], 'max_minutes' => null, 'houdbaar' => false, 'active' => false]));
+            ->where('filters', ['q' => null, 'tag' => [], 'max_minutes' => null, 'houdbaar' => false, 'country' => null, 'active' => false]));
 });
 
 it('reports invalid filters as not applied', function () {
     $this->get('/recepten?q[]=x&tag=y&max_minutes=0&houdbaar=maybe')
         ->assertInertia(fn (Assert $page) => $page
-            ->where('filters', ['q' => null, 'tag' => [], 'max_minutes' => null, 'houdbaar' => false, 'active' => false]));
+            ->where('filters', ['q' => null, 'tag' => [], 'max_minutes' => null, 'houdbaar' => false, 'country' => null, 'active' => false]));
 });
 
 it('sends the tags of each listed recipe', function () {

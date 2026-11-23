@@ -144,6 +144,13 @@ function remove(): void {
                         Houdbaar
                     </Badge>
                     <Badge
+                        v-if="recipe.country"
+                        variant="secondary"
+                        data-testid="recipe-country"
+                    >
+                        {{ recipe.country }}
+                    </Badge>
+                    <Badge
                         v-for="tag in recipe.tags"
                         :key="tag.id"
                         variant="outline"

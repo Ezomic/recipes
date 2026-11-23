@@ -28,6 +28,7 @@ export type RecipeFilters = {
     tag: string[];
     max_minutes: number | null;
     houdbaar: boolean;
+    country: string | null;
     active: boolean;
 };
 
@@ -38,6 +39,7 @@ export type Recipe = {
     preparation_minutes: number;
     servings: number;
     houdbaar: boolean;
+    country: string | null;
     photo_version: string | null;
     created_at: string;
     updated_at: string;

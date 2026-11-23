@@ -25,6 +25,7 @@ const recipe: RecipeWithIngredients = {
     preparation_minutes: 45,
     servings: 6,
     houdbaar: true,
+    country: 'Frankrijk',
     photo_version: null,
     created_at: '',
     updated_at: '',
@@ -232,6 +233,29 @@ describe('RecipeForm', () => {
                 .findAll('datalist option')
                 .map((o) => o.attributes('value')),
         ).toEqual(['brood', 'kamperen']);
+    });
+
+    it('prefills the country and suggests the known ones', () => {
+        const wrapper = mount(RecipeForm, {
+            props: { recipe, knownCountries: ['Frankrijk', 'Italië'] },
+        });
+
+        expect(wrapper.find<HTMLInputElement>('#country').element.value).toBe(
+            'Frankrijk',
+        );
+        expect(
+            wrapper
+                .findAll('#known-countries option')
+                .map((o) => o.attributes('value')),
+        ).toEqual(['Frankrijk', 'Italië']);
+    });
+
+    it('starts a new recipe without a country', () => {
+        const wrapper = mount(RecipeForm);
+
+        expect(wrapper.find<HTMLInputElement>('#country').element.value).toBe(
+            '',
+        );
     });
 
     it('shows a validation error on the tags', async () => {
